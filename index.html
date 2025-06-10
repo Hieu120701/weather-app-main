@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body id="body" class="bg-gradient-to-b from-blue-900 to-indigo-900 text-white min-h-screen flex">
+  <!-- Sidebar -->
+  <aside class="sidebar flex flex-col items-center py-6 bg-black bg-opacity-40 w-16 min-h-screen">
+    <img src="images/weather.png" class="w-8 h-8 mb-8" alt="Weather">
+    <img src="images/home.png" class="w-6 h-6 mb-6 opacity-60" alt="Home">
+    <img src="images/star.png" class="w-6 h-6 mb-6 opacity-60" alt="Star">
+    <img src="images/settings.png" class="w-6 h-6 mb-6 opacity-60" alt="Settings">
+  </aside>
+
+  <!-- Main Content -->
+  <div class="flex-1 max-w-7xl mx-auto px-4 py-6">
+    <!-- Topbar -->
+    <div class="flex justify-between items-center py-4">
+      <div class="flex space-x-2">
+        <button class="bg-white bg-opacity-10 rounded-full px-4 py-1 flex items-center space-x-2">
+          <span>東京都</span><span class="text-yellow-400">●</span><span>24℃</span>
+        </button>
+        <button class="bg-white bg-opacity-10 rounded-full px-4 py-1 flex items-center space-x-2">
+          <span>大阪市</span><span>24℃</span>
+        </button>
+        <!-- Thêm các thành phố khác -->
+      </div>
+      <div class="flex items-center space-x-2">
+        <input type="text" id="search-input" class="input text-black p-2 rounded" placeholder="場所を検索" spellcheck="false">
+        <button id="search-btn" class="button bg-blue-500 text-white px-3 py-2 rounded"><img src="images/search.png" class="inline w-5 h-5" alt="検索"></button>
+        <button id="toggle-mode" class="bg-white text-black px-3 py-2 rounded">🌗</button>
+      </div>
+    </div>
+
+    <!-- 3 card ngang -->
+    <div class="main-cards-row grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+      <!-- Card: Thời tiết hiện tại -->
+      <div id="current-weather" class="main-card flex flex-col items-center justify-center">
+        <div>
+          <h1 class="text-2xl font-bold city" id="location-name">都市名</h1>
+          <p class="text-sm" id="weather-time">時刻</p>
+        </div>
+        <img src="images/rain.png" class="weather-icon-small" id="weather-img" alt="天気アイコン">
+        <div class="text-3xl font-bold temp mt-2" id="temperature">--℃</div>
+        <div class="text-sm" id="description">天気説明</div>
+        <div class="details flex justify-center gap-8 mt-4">
+          <div class="col flex items-center space-x-2">
+            <img src="images/humidity.png" class="icon-small" alt="湿度">
+            <div>
+              <p class="humidity font-bold" id="humidity">--%</p>
+              <p>湿度</p>
+            </div>
+          </div>
+          <div class="col flex items-center space-x-2">
+            <img src="images/wind.png" class="icon-small" alt="風速">
+            <div>
+              <p class="wind font-bold" id="wind">--km/h</p>
+              <p>風速</p>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- Card: Bản đồ -->
+      <div class="main-card flex flex-col items-center justify-center">
+        <div class="text-xs text-center mt-2 flex flex-col items-center gap-2" style="width: 100%;">
+          <span>その他の場所を表示</span>
+          <button id="locate-btn" class="locate-btn flex items-center gap-1 mt-1">
+            <img src="images/location.png" alt="Định vị" style="width:18px;height:18px;">
+            <span>現在地で検索</span>
+          </button>
+          <!-- Windy map nhúng, xem thời tiết động -->
+          <a href="https://www.windy.com/?35.6895,139.6917,5" target="_blank" title="Xem thời tiết động trên Windy"
+             style="display:block;border-radius:18px;overflow:hidden;margin-top:16px;width:100%;">
+            <iframe
+              width="300%"
+              height="4440"
+              src="https://embed.windy.com/embed2.html?lat=36.2048&lon=138.2529&detailLat=36.2048&detailLon=138.2529&width=600&height=260&zoom=5&level=surface&overlay=wind&product=ecmwf&menu=&message=true&marker=&calendar=now&pressure=&type=map&location=coordinates&detail=&metricWind=default&metricTemp=default&radarRange=-1"
+              frameborder="0"
+              style="border:0; border-radius:18px; display:block; width:100%; min-width:240px; max-width:100%;"
+              allowfullscreen>
+            </iframe>
+          </a>
+        </div>
+      </div>
+      <!-- Card: Biểu đồ mặt trời -->
+      <div class="main-card flex flex-col items-center justify-center" id="sun-info">
+        <img src="images/sun-graph.png" class="icon-sun" alt="Sun Graph">
+        <div class="flex flex-col items-center">
+          <div>日の出: <span class="font-bold" id="sunrise">--:--</span></div>
+          <div>日の入り: <span class="font-bold" id="sunset">--:--</span></div>
+          <div>長さ: <span class="font-bold" id="day-length">--時間</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Error Message -->
+    <div id="error-message" class="mb-4 text-red-500 font-bold text-center"></div>
+
+    <!-- Dự báo theo giờ -->
+    <div class="hourly-section mt-2">
+      <h2 class="text-xl font-bold mb-2">1時間ごとの予報</h2>
+      <div class="flex space-x-2 mb-2 justify-center">
+        <button class="tab-btn active" data-type="temp">概要</button>
+        <button class="tab-btn" data-type="rain">降水量</button>
+        <button class="tab-btn" data-type="wind">風</button>
+        <button class="tab-btn" data-type="humidity">湿度</button>
+      </div>
+      <div id="hourly-forecast"></div>
+    </div>
+
+    <!-- Weekly Forecast -->
+    <div class="mt-8">
+      <h2 class="text-xl font-bold mb-2">週間予報</h2>
+      <div id="daily-forecast"></div>
+    </div>
+    <p class="mt-8 text-center text-xs text-white/70">Made by VINMO.DEV</p>
+  </div>
+  <script>
+    const apikey = "70a0b2cb36a5ef013414269041b73822";
+    const apiUrl = "https://api.openweathermap.org/data/2.5/weather?units=metric&q=";
+    const forecastApiUrl = "https://api.openweathermap.org/data/2.5/forecast?units=metric&q=";
+
+    const searchInput = document.getElementById("search-input");
+    const searchBtn = document.getElementById("search-btn");
+    const weatherImg = document.getElementById("weather-img");
+
+    let currentHourlyType = "temp";
+    let lastForecastData = null;
+
+    function renderHourly(forecastData, type = "temp") {
+      const iconMap = {
+        "Clouds": "clouds.png",
+        "Rain": "rain.png",
+        "Clear": "clear.png",
+        "Mist": "mist.png",
+        "Drizzle": "drizzle.png",
+        "Snow": "snow.png"
+      };
+      document.getElementById("hourly-forecast").innerHTML = forecastData.list.slice(0, 8).map(f => {
+        let value = "";
+        let unit = "";
+        if (type === "temp") {
+          value = Math.round(f.main.temp);
+          unit = "°";
+        } else if (type === "rain") {
+          value = f.rain && f.rain["3h"] ? f.rain["3h"] : 0;
+          unit = "mm";
+        } else if (type === "wind") {
+          value = Math.round(f.wind.speed);
+          unit = "m/s";
+        } else if (type === "humidity") {
+          value = f.main.humidity;
+          unit = "%";
+        }
+        return `
+          <div class="hourly-card">
+            <div>${new Date(f.dt * 1000).getHours()}:00</div>
+            <img src="images/${iconMap[f.weather[0].main] || "clouds.png"}" class="hourly-icon" alt="">
+            <div>${value}${unit}</div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    async function checkWeather(city) {
+      try {
+        const response = await fetch(apiUrl + encodeURIComponent(city) + '&appid=' + apikey + '&lang=ja');
+        const forecastResponse = await fetch(forecastApiUrl + encodeURIComponent(city) + '&appid=' + apikey + '&lang=ja');
+
+        if (response.status == 404 || forecastResponse.status == 404) {
+          document.getElementById("error-message").textContent = "都市名が正しくありません";
+          document.getElementById("current-weather").style.display = "none";
+          document.getElementById("hourly-forecast").style.display = "none";
+          document.getElementById("sun-info").style.display = "none";
+          document.getElementById("daily-forecast").style.display = "none";
+          return;
+        } else {
+          document.getElementById("error-message").textContent = "";
+          document.getElementById("current-weather").style.display = "";
+          document.getElementById("hourly-forecast").style.display = "";
+          document.getElementById("sun-info").style.display = "";
+          document.getElementById("daily-forecast").style.display = "";
+        }
+
+        const data = await response.json();
+        const forecastData = await forecastResponse.json();
+
+        // Current weather
+        document.getElementById("location-name").innerText = data.name;
+        document.getElementById("temperature").innerText = Math.round(data.main.temp) + "°C";
+        document.getElementById("humidity").innerText = data.main.humidity + "%";
+        document.getElementById("wind").innerText = data.wind.speed + "km/h";
+        document.getElementById("description").innerText = data.weather[0].description;
+        document.getElementById("weather-time").innerText = new Date(data.dt * 1000).toLocaleTimeString("ja-JP");
+
+        // Weather icon
+        const iconMap = {
+          "Clouds": "clouds.png",
+          "Rain": "rain.png",
+          "Clear": "clear.png",
+          "Mist": "mist.png",
+          "Drizzle": "drizzle.png",
+          "Snow": "snow.png"
+        };
+        weatherImg.src = "images/" + (iconMap[data.weather[0].main] || "clouds.png");
+
+        // Sun info
+        document.getElementById("sunrise").textContent = new Date(data.sys.sunrise * 1000).toLocaleTimeString("ja-JP");
+        document.getElementById("sunset").textContent = new Date(data.sys.sunset * 1000).toLocaleTimeString("ja-JP");
+        const duration = (data.sys.sunset - data.sys.sunrise) / 3600;
+        document.getElementById("day-length").textContent = `${Math.floor(duration)}時間${Math.round((duration % 1) * 60)}分`;
+
+        // Hourly forecast (next 6)
+        document.getElementById("hourly-forecast").innerHTML = forecastData.list.slice(0, 6).map(f => `
+          <div class="hourly-card">
+            <div>${new Date(f.dt * 1000).getHours()}:00</div>
+            <img src="images/${iconMap[f.weather[0].main] || "clouds.png"}" class="hourly-icon" alt="">
+            <div>${Math.round(f.main.temp)}°</div>
+          </div>`).join('');
+
+        // Daily forecast (group by day)
+        const daily = {};
+        forecastData.list.forEach(f => {
+          const day = new Date(f.dt * 1000).toLocaleDateString("ja-JP", { weekday: 'short' });
+          if (!daily[day]) daily[day] = [];
+          daily[day].push(f);
+        });
+        document.getElementById("daily-forecast").innerHTML = Object.entries(daily).slice(0, 7).map(([day, list]) => {
+          const temps = list.map(l => l.main.temp);
+          const max = Math.round(Math.max(...temps));
+          const min = Math.round(Math.min(...temps));
+          const icon = iconMap[list[0].weather[0].main] || "clouds.png";
+          return `<div class="daily-card">
+            <div>${day}</div>
+            <img src="images/${icon}" class="daily-icon" alt="">
+            <div>${max}° / ${min}°</div>
+          </div>`;
+        }).join('');
+
+        lastForecastData = forecastData;
+        renderHourly(forecastData, currentHourlyType);
+
+      } catch (e) {
+        document.getElementById("error-message").textContent = "天気情報の取得に失敗しました";
+      }
+    }
+
+    // Search button and Enter key
+    searchBtn.addEventListener("click", () => {
+      checkWeather(searchInput.value);
+    });
+    searchInput.addEventListener("keypress", (event) => {
+      if (event.key === "Enter") {
+        checkWeather(searchInput.value);
+      }
+    });
+
+    // Mode toggle
+    document.getElementById("toggle-mode").addEventListener("click", () => {
+      const body = document.getElementById("body");
+      if (body.classList.contains("dark-mode")) {
+        body.classList.remove("dark-mode");
+        body.classList.add("light-mode");
+      } else if (body.classList.contains("light-mode")) {
+        body.classList.remove("light-mode");
+        body.classList.add("dark-mode");
+      } else {
+        body.classList.add("dark-mode");
+      }
+    });
+
+    // Tab click event
+    document.querySelectorAll('.tab-btn').forEach(btn => {
+      btn.addEventListener('click', function() {
+        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+        this.classList.add('active');
+        currentHourlyType = this.getAttribute('data-type');
+        if (lastForecastData) renderHourly(lastForecastData, currentHourlyType);
+      });
+    });
+
+    // Xử lý nút định vị
+    document.getElementById("locate-btn").addEventListener("click", function() {
+      if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(function(position) {
+          const lat = position.coords.latitude;
+          const lon = position.coords.longitude;
+          fetch(`https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&appid=${apikey}&units=metric&lang=ja`)
+            .then(res => res.json())
+            .then(data => {
+              checkWeather(data.name);
+            });
+        }, function() {
+          alert("位置情報の取得に失敗しました");
+        });
+      } else {
+        alert("このブラウザは位置情報取得に対応していません");
+      }
+    });
+
+    // Initial load
+    checkWeather("Tokyo");
+  </script>
+</body>
+</html>
+
+
+
+
+
+
+
+
