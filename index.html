@@ -34,7 +34,7 @@
         <button id="toggle-mode" class="bg-white text-black px-3 py-2 rounded">🌗</button>
       </div>
     </div>
-    
+
 
     <!-- 3 card ngang -->
     <div class="main-cards-row grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
@@ -67,17 +67,16 @@
       <!-- Card: Bản đồ -->
       <div class="main-card flex flex-col items-center justify-center">
         <div class="text-xs text-center mt-2 flex flex-col items-center gap-2" style="width: 100%;">
-          <span>その他の場所を表示</span>
+          <span>現在地で検索</span>
           <button id="locate-btn" class="locate-btn flex items-center gap-1 mt-1">
-            <img src="images/location.png" alt="Định vị" style="width:18px;height:18px;">
-            <span>現在地で検索</span>
+            <img src="images/location.png" alt="Định vị" style="width:28px;height:28px;">
           </button>
           <!-- Windy map nhúng, xem thời tiết động -->
           <a href="https://www.windy.com/?35.6895,139.6917,5" target="_blank" title="Xem thời tiết động trên Windy"
              style="display:block;border-radius:18px;overflow:hidden;margin-top:16px;width:100%;">
             <iframe
-              width="300%"
-              height="4440"
+              width="100%"
+              height="340"
               src="https://embed.windy.com/embed2.html?lat=36.2048&lon=138.2529&detailLat=36.2048&detailLon=138.2529&width=600&height=260&zoom=5&level=surface&overlay=wind&product=ecmwf&menu=&message=true&marker=&calendar=now&pressure=&type=map&location=coordinates&detail=&metricWind=default&metricTemp=default&radarRange=-1"
               frameborder="0"
               style="border:0; border-radius:18px; display:block; width:100%; min-width:240px; max-width:100%;"
@@ -87,36 +86,35 @@
         </div>
       </div>
       <!-- Card: Biểu đồ mặt trời -->
-      <div class="main-card flex flex-col items-center justify-center" id="sun-info">
-        <img src="images/sun-graph.png" class="icon-sun" alt="Sun Graph">
-        <div class="flex flex-col items-center">
-          <div>日の出: <span class="font-bold" id="sunrise">--:--</span></div>
-          <div>日の入り: <span class="font-bold" id="sunset">--:--</span></div>
-          <div>長さ: <span class="font-bold" id="day-length">--時間</span></div>
-        </div>
-      </div>
+<div class="main-card flex flex-col items-center justify-center" id="sun-info">
+  <div class="sun-info text-center mt-4">
+    <div>
+      <img src="images/sunrise.png" width="32" style="display:inline"> 日の出: <span class="font-bold" id="sunrise">--:--</span>
     </div>
+    <div>
+      <img src="images/sunset.png" width="32" style="display:inline"> 日の入り: <span class="font-bold" id="sunset">--:--</span>
+    </div>
+    <div>
+      <img src="images/clock.png" width="32" style="display:inline"> 長さ: <span class="font-bold" id="day-length">--時間</span>
+    </div>
+  </div>
+</div>
 
     <!-- Error Message -->
     <div id="error-message" class="mb-4 text-red-500 font-bold text-center"></div>
 
     <!-- Dự báo theo giờ -->
     <div class="hourly-section mt-2">
-      <h2 class="text-xl font-bold mb-2">1時間ごとの予報</h2>
-      <div class="flex space-x-2 mb-2 justify-center">
-        <button class="tab-btn active" data-type="temp">概要</button>
-        <button class="tab-btn" data-type="rain">降水量</button>
-        <button class="tab-btn" data-type="wind">風</button>
-        <button class="tab-btn" data-type="humidity">湿度</button>
-      </div>
-      <div id="hourly-forecast"></div>
+      <div class="w-full max-w-3xl mx-auto">
+  <h2 class="text-xl font-bold mb-2 text-center">1時間ごとの予報</h2>
+  <div id="hourly-forecast"></div>
+</div>
+<div class="w-full max-w-3xl mx-auto mt-8">
+  <h2 class="text-xl font-bold mb-2 text-center">週間予報</h2>
+  <div id="daily-forecast" class="flex flex-wrap justify-center gap-4"></div>
+</div>
     </div>
 
-    <!-- Weekly Forecast -->
-    <div class="mt-8">
-      <h2 class="text-xl font-bold mb-2">週間予報</h2>
-      <div id="daily-forecast"></div>
-    </div>
     <p class="mt-8 text-center text-xs text-white/70">Made by VINMO.DEV</p>
   </div>
   <script>
@@ -166,7 +164,7 @@
       }).join('');
     }
 
-    async function checkWeather(city) {
+    async function checkWeather(city = "Tokyo") {
       try {
         const response = await fetch(apiUrl + encodeURIComponent(city) + '&appid=' + apikey + '&lang=ja');
         const forecastResponse = await fetch(forecastApiUrl + encodeURIComponent(city) + '&appid=' + apikey + '&lang=ja');
@@ -289,16 +287,25 @@
         navigator.geolocation.getCurrentPosition(function(position) {
           const lat = position.coords.latitude;
           const lon = position.coords.longitude;
+          // Gọi API lấy thời tiết theo lat/lon và cập nhật giao diện
           fetch(`https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&appid=${apikey}&units=metric&lang=ja`)
             .then(res => res.json())
             .then(data => {
-              checkWeather(data.name);
+              if (data && data.name) {
+                checkWeather(data.name);
+              } else {
+                document.getElementById("error-message").textContent = "位置情報から都市名を取得できません";
+              }
+            })
+            .catch(() => {
+              document.getElementById("error-message").textContent = "位置情報の取得に失敗しました";
             });
+
         }, function() {
-          alert("位置情報の取得に失敗しました");
+          document.getElementById("error-message").textContent = "位置情報の取得に失敗しました";
         });
       } else {
-        alert("このブラウザは位置情報取得に対応していません");
+        document.getElementById("error-message").textContent = "このブラウザは位置情報取得に対応していません";
       }
     });
 
@@ -307,7 +314,6 @@
   </script>
 </body>
 </html>
-
 
 
 
