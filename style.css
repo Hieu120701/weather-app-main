@@ -1,14 +1,17 @@
 @keyframes gradientAnimation {
-    0% {
-        background-position: 0% 50%;
-    }
-    50% {
-        background-position: 100% 50%;
-    }
-    100% {
-        background-position: 0% 50%;
-    }
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
 }
+
+html, body {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+/*html, body {
+  box-sizing: border-box;
+}*/
 
 body {
   background: linear-gradient(135deg, #23234f 0%, #4b3b6b 100%) !important;
@@ -16,19 +19,23 @@ body {
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
   margin: 0;
   padding: 0;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
   min-height: 100vh;
+  display: flex;              /* Sửa: flex để sidebar và main content nằm ngang */
+  flex-direction: row;        /* Sửa: row để sidebar bên trái, main content bên phải */
+  align-items: flex-start;    /* Sửa: căn top */
 }
 
 body.dark-mode {
-  background: linear-gradient(to bottom, #1e3a8a, #3730a3); /* màu tối */
+  background: linear-gradient(to bottom, #1e3a8a, #3730a3);
   color: #fff;
 }
 body.light-mode {
-  background: linear-gradient(to bottom, #f0f4ff, #c7d2fe); /* màu sáng */
+  background: linear-gradient(to bottom, #f0f4ff, #c7d2fe);
   color: #222;
+}
+
+*, *::before, *::after {
+  box-sizing: inherit;
 }
 
 .card {
@@ -202,22 +209,99 @@ button:hover {
 }
 
 /* Sidebar */
+/*.sidebar {
+  background: rgba(0, 0, 0, 0.4);
+  width: 30px;               
+  min-width: 40px;
+  min-height: fit-content;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  padding-top: 24px;
+  padding-left: 8px;
+ 
+  position: relative;
+  z-index: 2;
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 1000;
+ 
+}*/
 .sidebar {
-  background: rgba(0,0,0,0.4);
-  min-width: 64px;
-  min-height: 100vh;
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 100vh;
+  width: 60px;
+  background-color: #1f2937;
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding-top: 24px;
+  padding-top: 20px;
+  z-index: 1000;
 }
-.sidebar img {
-  margin-bottom: 24px;
-  opacity: 0.7;
+
+/* Page-ийн агуулгын үндсэн хэсэг */
+.main-content {
+  margin-left: 60px; /* Sidebar-ийн өргөтгөсөн хэмжээтэй адилхан байх ёстой */
+  padding: 20px;
+}
+
+
+.sidebar-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
+}
+
+.sidebar-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 8px 0 8px 0;
+  width: 100%;
+  cursor: pointer;
+}
+
+.sidebar-item.active {
+  background: #2563eb;
+  border-radius: 8px;
+}
+
+.sidebar-icon {
+  width: 28px;
+  height: 28px;
+  opacity: 0.8;
+  margin: 0 0 0 4px;
   transition: opacity 0.2s;
 }
-.sidebar img:hover {
+
+.sidebar-item:hover .sidebar-icon,
+.sidebar-item.active .sidebar-icon {
   opacity: 1;
+}
+
+.sidebar-label {
+  font-size: 1rem;
+  color: #fff;
+  font-weight: 500;
+  letter-spacing: 0.5px;
+  white-space: nowrap;
+}
+
+/* Ẩn label trên mobile nếu muốn */
+@media (max-width: 600px) {
+  .sidebar-label {
+    display: none;
+  }
+  .sidebar {
+    width: 56px;
+    min-width: 56px;
+    padding-left: 0;
+  }
 }
 
 /* Topbar */
@@ -409,9 +493,14 @@ button:hover {
 }
 
 /* Đảm bảo chữ trắng toàn bộ */
-* {
+.weather-grid .card,
+.card-value,
+.card-title,
+.card-desc,
+.main-card,
+.hourly-card,
+.daily-card {
   color: #fff;
-  box-sizing: border-box;
 }
 
 /* Hourly forecast: khung lớn hơn, icon vừa */
@@ -473,8 +562,8 @@ button:hover {
   border-radius: 22px;
   box-shadow: 0 2px 8px 0 rgba(31,38,135,0.08);
   width: 100px;         /* to hơn */
-  min-width: 100px;
-  padding: 24px 0 20px 0; /* cao hơn */
+  min-width: 110px;
+  padding: 18px 10px;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -482,19 +571,19 @@ button:hover {
   color: #fff;
 }
 .daily-icon {
-  width: 48px !important;
-  height: 48px !important;
-  margin: 12px 0 8px 0;
-  display: block;
+  width: 64px !important;
+  height: 64px !important;
+  margin: 0 auto;
 }
 .daily-card > div:first-child {
   font-weight: 500;
   margin-bottom: 4px;
+  font-size: 1.1rem;
 }
 .daily-card > div:last-child {
-  font-size: 20px;
+  font-size: 1.2rem;
   font-weight: bold;
-  margin-top: 4px;
+  margin-top: 8px;
 }
 
 /* Responsive: vẫn giữ nhỏ gọn trên mobile */
@@ -556,4 +645,211 @@ button:hover {
 }
 .locate-btn:hover {
   background: rgba(255,255,255,0.28);
+}
+
+/* Grid cân đối, responsive */
+.weather-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 24px;
+  max-width: 1200px;
+  margin: 64px auto 32px auto;
+  width: 100vw;
+  box-sizing: border-box;
+  padding-left: 16px;
+  padding-right: 16px;
+  align-items: stretch;
+}
+
+/* Card đều nhau, căn giữa nội dung */
+.weather-grid .card {
+  background: rgba(30,40,70,0.95);
+  border-radius: 18px;
+  box-shadow: 0 2px 16px #0002;
+  padding: 20px 18px 16px 18px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-height: 200px;
+  justify-content: center;
+  height: 100%;
+  box-sizing: border-box;
+}
+
+.card-title {
+  font-size: 1.1rem;
+  font-weight: 600;
+  margin-bottom: 8px;
+  color: #aee1ff;
+  letter-spacing: 1px;
+  text-align: center;
+  width: 100%;
+}
+
+.card-main {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.card-value {
+  font-size: 2.1rem;
+  font-weight: bold;
+  color: #fff;
+  min-width: 60px;
+  text-align: center;
+}
+
+.card-desc {
+  font-size: 0.95rem;
+  color: #b0b8c9;
+  margin-top: 2px;
+  text-align: center;
+  width: 100%;
+}
+
+@media (max-width: 900px) {
+  .weather-grid {
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 16px;
+  }
+  .weather-grid .card {
+    min-height: 160px;
+    padding: 14px 8px 12px 8px;
+  }
+  .card-value {
+    font-size: 1.5rem;
+    min-width: 40px;
+  }
+}
+
+/* Tăng size chữ cho các giá trị chính */
+#temperature,
+.card-value,
+#feels-value,
+#clouds-value,
+#rain-value,
+#wind-value,
+#humidity-value,
+#visibility-value,
+#pressure-value {
+  font-size: 2.2rem;
+  font-weight: bold;
+}
+
+#location-name {
+  font-size: 2rem;
+}
+
+#description,
+.card-desc {
+  font-size: 1.2rem;
+}
+
+#weather-time {
+  font-size: 1.1rem;
+}
+
+/* Tăng size icon chính */
+.weather-icon-small,
+#weather-img {
+  width: 90px;
+  height: 90px;
+}
+
+.icon-small {
+  width: 36px;
+  height: 36px;
+}
+
+.hourly-icon,
+.daily-icon {
+  width: 48px;
+  height: 48px;
+}
+
+/* Tăng size nút tab */
+.tab-btn {
+  font-size: 1.1rem;
+  padding: 8px 18px;
+}
+
+/* Tăng size tiêu đề */
+h1, h2, .card-title {
+  font-size: 1.4rem;
+}
+
+/* Tăng size cho thông tin mặt trời */
+#sunrise, #sunset, #day-length {
+  font-size: 1.3rem;
+}
+
+/* Căn đều khoảng cách trên/dưới và giữa các phần tử trong daily-card */
+.daily-card {
+  min-width: 110px;
+  min-height: 170px;
+  padding: 20px 10px;
+  font-size: 1.2rem;
+  border-radius: 18px;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+  background: rgba(255,255,255,0.08);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between; /* Căn đều trên-dưới */
+  margin: 0 8px;
+  gap: 14px; /* Khoảng cách giữa các dòng trong card */
+}
+
+/* Tăng kích thước icon thời tiết trong daily forecast */
+.daily-icon {
+  width: 64px !important;
+  height: 64px !important;
+  margin: 0 auto;
+}
+
+/* Căn giữa và tăng size chữ ngày và nhiệt độ trong daily card */
+.daily-card > div:first-child {
+  font-size: 1.1rem;
+  font-weight: bold;
+  margin-bottom: 0;
+  text-align: center;
+}
+.daily-card > div:last-child {
+  font-size: 1.2rem;
+  margin-top: 0;
+  text-align: center;
+}
+
+.weather-detail-label {
+  text-align: left;
+  margin: 0 0 1px 8px; /* Trái 8px, dưới 1px, trên không cần */
+  font-size: 1.3rem;
+  font-weight: 600;
+  color: #fff;
+  letter-spacing: 1px;
+}
+
+.weather-detail-header {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+  margin: 0 0 8px 8px;
+}
+
+.weather-detail-title {
+  font-size: 1.6rem;
+  font-weight: 700;
+  color: #fff;
+  letter-spacing: 1px;
+}
+
+.weather-detail-time {
+  font-size: 1rem;
+  color: #cbd5e1;
+  font-weight: 400;
+  margin-top: 4px;
 }

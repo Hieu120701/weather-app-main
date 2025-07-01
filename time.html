@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <title>1時間ごとの予報</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <style>
+    html, body { height: 100%; margin: 0; padding: 0; }
+    body {
+      display: flex;
+      flex-direction: row;
+      min-height: 100vh;
+      background: url('images/background_time.jpg') no-repeat center center fixed;
+      background-size: cover;
+    }
+    .sidebar {
+      width: 56px;
+      background: #232b39cc;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      position: fixed;
+      left: 0;
+      top: 0;
+      bottom: 0;
+      height: 100vh;
+      z-index: 100;
+      box-shadow: 2px 0 12px #0002;
+    }
+    .sidebar-content {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;           /* Đảm bảo giống nhau */
+      width: 100%;
+      align-items: center;
+      padding: 12px 0;     /* Thêm padding trên/dưới nếu cần */
+    }
+    .sidebar-item {
+      width: 100%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 48px;        /* Đảm bảo giống nhau */
+    }
+    .sidebar-icon {
+      font-size: 22px;     /* Đảm bảo giống nhau */
+      color: #cbd5e1;
+      cursor: pointer;
+      transition: color 0.2s, background 0.2s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 32px;         /* Đảm bảo giống nhau */
+      height: 32px;        /* Đảm bảo giống nhau */
+      border-radius: 8px;
+      background: transparent;
+    }
+    .sidebar-icon:hover {
+      color: #38bdf8;
+      background: #1e293b;
+    }
+    .main-content, .main-map-content {
+      margin-left: 56px;
+      flex: 1 1 0%;
+      min-width: 0;
+      padding: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
+    }
+    .forecast-container {
+      max-width: 700px;
+      margin: 32px auto;
+      background: rgba(255,255,255,0.7);
+      border-radius: 16px;
+      box-shadow: 0 4px 24px #0002;
+      padding: 24px 0 16px 0;
+      width: 100%;
+    }
+    .forecast-tabs {
+      display: flex;
+      gap: 8px;
+      padding: 0 24px 16px 24px;
+      overflow-x: auto;
+    }
+    .forecast-tab {
+      background: #1e40af;
+      color: #fff;
+      border-radius: 8px 8px 0 0;
+      padding: 8px 16px;
+      font-weight: 500;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      cursor: pointer;
+      border: none;
+      outline: none;
+      min-width: 80px;
+      transition: background 0.2s;
+    }
+    .forecast-tab.active {
+      background: #2563eb;
+      color: #ffe066;
+    }
+    .forecast-table {
+      width: 100%;
+      border-collapse: collapse;
+      background: transparent;
+      table-layout: fixed;
+    }
+    .forecast-table th, .forecast-table td {
+      padding: 16px 0;
+      text-align: center;
+      border-bottom: 2px solid #a5b4fc;
+      border-right: 1px solid #a5b4fc;
+      font-size: 22px;
+      color: #222;
+      font-weight: 500;
+      background: rgba(255,255,255,0.7);
+    }
+    .forecast-table th:last-child,
+    .forecast-table td:last-child {
+      border-right: none;
+    }
+    .forecast-table th {
+      color: #2563eb;
+      font-weight: 700;
+      font-size: 24px;
+      background: linear-gradient(90deg, #bae6fd 0%, #a5b4fc 100%);
+      /* hoặc background: #bae6fd; nếu muốn màu đơn sắc */
+    }
+    .forecast-table td img {
+      vertical-align: middle;
+      width: 40px;
+      height: 40px;
+    }
+    .wind-info {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      justify-content: center;
+      font-size: 22px;
+      height: 40px;
+      line-height: 40px;
+    }
+    .wind-info i {
+      font-size: 28px;
+      line-height: 1;
+    }
+    @media (max-width: 600px) {
+      .forecast-container { max-width: 100%; border-radius: 0; }
+      .forecast-table th, .forecast-table td { font-size: 16px; }
+      .forecast-table td img { width: 28px; height: 28px; }
+      .wind-info { font-size: 16px; height: 28px; line-height: 28px; }
+      .wind-info i { font-size: 20px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="sidebar">
+    <div class="sidebar-content">
+      <div class="sidebar-item">
+        <i class="fa-solid fa-house sidebar-icon" id="home-icon"></i>
+      </div>
+      <div class="sidebar-item">
+        <i class="fa-solid fa-bullseye sidebar-icon" id="weather-map-icon"></i>
+      </div>
+      <div class="sidebar-item">
+        <i class="fa-regular fa-clock sidebar-icon" id="time-icon"></i>
+      </div>
+      <div class="sidebar-item">
+        <i class="fa-regular fa-calendar sidebar-icon"></i>
+      </div>
+      <div class="sidebar-item">
+        <i class="fa-solid fa-cloud sidebar-icon"></i>
+      </div>
+      <div class="sidebar-item">
+        <i class="fa-solid fa-chart-line sidebar-icon"></i>
+      </div>
+      <div class="sidebar-item">
+        <i class="fa-regular fa-star sidebar-icon"></i>
+      </div>
+      <div class="sidebar-item">
+        <i class="fa-regular fa-face-smile sidebar-icon"></i>
+      </div>
+    </div>
+  </div>
+  <div class="main-content">
+    <div class="forecast-container">
+      <!-- Tabs ngày -->
+      <div class="forecast-tabs">
+        <button class="forecast-tab active"> 今日</button>
+      </div>
+      <!-- Bảng dự báo thời tiết -->
+      <table class="forecast-table">
+        <thead>
+          <tr>
+            <th>時間</th>
+            <th>天気</th>
+            <th>気温</th>
+            <th>風速</th>
+          </tr>
+        </thead>
+        <tbody id="forecast-body">
+          <!-- Dữ liệu sẽ được sinh tự động bằng JS -->
+        </tbody>
+      </table>
+    </div>
+  </div>
+  <script>
+    // Sidebar navigation
+    document.getElementById('home-icon').onclick = function() {
+      window.location.href = 'index.html';
+    };
+    document.getElementById('weather-map-icon').onclick = function() {
+      window.location.href = 'maps.html';
+    };
+    document.getElementById('time-icon').onclick = function() {
+      window.location.href = 'time.html';
+    };
+
+    // Lấy icon đúng với ảnh bạn có
+    function getWeatherIcon(code) {
+      if (code === 0) return "images/clear.png"; // Trời nắng
+      if ([1,2,3].includes(code)) return "images/clouds.png"; // Nhiều mây
+      if ([45,48].includes(code)) return "images/fog.png"; // Sương mù
+      if ([51,53,55,56,57,61,63,65,66,67,80,81,82].includes(code)) return "images/rain.png"; // Mưa
+      if ([71,73,75,77,85,86].includes(code)) return "images/snow.png"; // Tuyết
+      if ([95,96,99].includes(code)) return "images/thunder.png"; // Dông
+      return "images/clouds.png";
+    }
+    function getWeatherText(code) {
+      if (code === 0) return "晴れ";
+      if ([1,2,3].includes(code)) return "曇り";
+      if ([45,48].includes(code)) return "霧";
+      if ([51,53,55,56,57,61,63,65,66,67,80,81,82].includes(code)) return "雨";
+      if ([71,73,75,77,85,86].includes(code)) return "雪";
+      if ([95,96,99].includes(code)) return "雷雨";
+      return "曇り";
+    }
+
+    // Lấy vị trí và gọi API Open-Meteo
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(function(pos) {
+        const lat = pos.coords.latitude;
+        const lon = pos.coords.longitude;
+        fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&hourly=temperature_2m,windspeed_10m,weathercode&timezone=auto`)
+          .then(res => res.json())
+          .then(data => {
+            const now = new Date();
+            const hour = now.getHours();
+            const tbody = document.getElementById('forecast-body');
+            tbody.innerHTML = "";
+            for (let i = 0; i < 24; i++) {
+              const idx = hour + i;
+              const h = (hour + i) % 24;
+              const temp = data.hourly.temperature_2m[idx];
+              const wind = data.hourly.windspeed_10m[idx];
+              const code = data.hourly.weathercode[idx];
+              const icon = getWeatherIcon(code);
+              const text = getWeatherText(code);
+              const tr = document.createElement('tr');
+              tr.innerHTML = `
+                <td>${h.toString().padStart(2, '0')}:00</td>
+                <td><img src="${icon}" width="40" height="40"> ${text}</td>
+                <td>${Math.round(temp)}°C</td>
+                <td class="wind-info"><i class="fa-solid fa-wind"></i> ${wind} m/s</td>
+              `;
+              tbody.appendChild(tr);
+            }
+          });
+      }, function() {
+        document.getElementById('forecast-body').innerHTML = '<tr><td colspan="4">Không lấy được vị trí của bạn.</td></tr>';
+      });
+    } else {
+      document.getElementById('forecast-body').innerHTML = '<tr><td colspan="4">Trình duyệt không hỗ trợ định vị.</td></tr>';
+    }
+  </script>
+</body>
+</html>
+
+
+
+
