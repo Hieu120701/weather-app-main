@@ -1,0 +1,419 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>月間予報</title>
+  <link rel="stylesheet" href="weather-app-main/style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <style>
+    body {
+      background: url('https://images.unsplash.com/photo-1501854140801-50d01698950b?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1950&q=80') no-repeat center center fixed;
+      background-size: cover;
+      display: flex;
+      flex-direction: row;
+      min-height: 100vh;
+    }
+
+    .main-content {
+      margin-left: 60px;
+      flex: 1;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .location-header {
+      display: flex;
+      align-items: center;
+      margin-bottom: 20px;
+      color: white;
+      font-size: 24px;
+      font-weight: bold;
+    }
+
+    .location-header i {
+      margin-right: 10px;
+      font-size: 24px;
+    }
+
+    .month-navigation {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 5px;
+      margin-bottom: 20px;
+      width: 100%;
+      max-width: 1000px;
+    }
+
+    .month-btn {
+      background-color: rgba(0, 0, 0, 0.5);
+      color: white;
+      border: none;
+      border-radius: 5px;
+      padding: 10px 15px;
+      cursor: pointer;
+      transition: background-color 0.3s;
+      font-size: 16px;
+      min-width: 60px;
+    }
+
+    .month-btn.active {
+      background-color: #f7c948;
+      color: #333;
+      font-weight: bold;
+    }
+
+    .month-btn:hover:not(.active) {
+      background-color: rgba(0, 0, 0, 0.7);
+    }
+
+    .calendar-container {
+      background-color: rgba(0, 0, 0, 0.5);
+      border-radius: 10px;
+      padding: 20px;
+      width: 100%;
+      max-width: 1000px;
+    }
+
+    .weekdays {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      text-align: center;
+      color: white;
+      font-weight: bold;
+      margin-bottom: 10px;
+      padding: 10px 0;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+    }
+
+    .calendar-grid {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 10px;
+    }
+
+    .calendar-day {
+      background-color: rgba(0, 0, 0, 0.3);
+      border-radius: 5px;
+      padding: 10px;
+      text-align: center;
+      color: white;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-height: 100px;
+    }
+
+    .calendar-day .date {
+      font-size: 18px;
+      font-weight: bold;
+      margin-bottom: 5px;
+    }
+
+    .calendar-day .weather-icon {
+      width: 40px;
+      height: 40px;
+      margin: 5px 0;
+    }
+
+    .calendar-day .temp-high {
+      font-size: 18px;
+      font-weight: bold;
+      color: white;
+    }
+
+    .calendar-day .temp-low {
+      font-size: 16px;
+      color: #ccc;
+    }
+
+    .next-month {
+      opacity: 0.5;
+    }
+
+    @media (max-width: 768px) {
+      .calendar-grid {
+        gap: 5px;
+      }
+      
+      .calendar-day {
+        padding: 5px;
+        min-height: 80px;
+      }
+      
+      .calendar-day .date {
+        font-size: 14px;
+      }
+      
+      .calendar-day .weather-icon {
+        width: 30px;
+        height: 30px;
+      }
+      
+      .calendar-day .temp-high,
+      .calendar-day .temp-low {
+        font-size: 14px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- Sidebar -->
+  <div class="sidebar">
+    <div class="sidebar-content">
+      <div class="sidebar-item">
+        <i class="fa-solid fa-house sidebar-icon" id="home-icon"></i>
+      </div>
+      <div class="sidebar-item">
+        <i class="fa-solid fa-bullseye sidebar-icon" id="weather-map-icon"></i>
+      </div>
+      <div class="sidebar-item">
+        <i class="fa-regular fa-clock sidebar-icon" id="time-icon"></i>
+      </div>
+      <div class="sidebar-item">
+        <i class="fa-regular fa-calendar sidebar-icon" id="calendar-icon"></i>
+      </div>
+      <div class="sidebar-item">
+        <i class="fa-solid fa-cloud sidebar-icon"></i>
+      </div>
+      <div class="sidebar-item">
+        <i class="fa-solid fa-chart-line sidebar-icon"></i>
+      </div>
+      <div class="sidebar-item">
+        <i class="fa-regular fa-star sidebar-icon"></i>
+      </div>
+      <div class="sidebar-item">
+        <i class="fa-regular fa-face-smile sidebar-icon"></i>
+      </div>
+    </div>
+  </div>
+
+  <!-- Main Content -->
+  <div class="main-content">
+    <div class="location-header">
+      <i class="fa-solid fa-location-dot"></i>
+      <span id="location-name">神奈川県, 横浜市</span>
+    </div>
+
+    <div class="month-navigation">
+      <button class="month-btn active" data-month="5">6月</button>
+      <button class="month-btn" data-month="6">7月</button>
+      <button class="month-btn" data-month="7">8月</button>
+      <button class="month-btn" data-month="8">9月</button>
+      <button class="month-btn" data-month="9">10月</button>
+      <button class="month-btn" data-month="10">11月</button>
+      <button class="month-btn" data-month="11">12月</button>
+      <button class="month-btn" data-month="0">1月</button>
+      <button class="month-btn" data-month="1">2月</button>
+      <button class="month-btn" data-month="2">3月</button>
+      <button class="month-btn" data-month="3">4月</button>
+      <button class="month-btn" data-month="4">5月</button>
+    </div>
+
+    <div class="calendar-container">
+      <div class="weekdays">
+        <div>日曜</div>
+        <div>月曜</div>
+        <div>火曜</div>
+        <div>水曜</div>
+        <div>木曜</div>
+        <div>金曜</div>
+        <div>土曜</div>
+      </div>
+      <div class="calendar-grid" id="calendar-grid">
+        <!-- Calendar days will be generated by JavaScript -->
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Weather data (simulated for demonstration)
+    const weatherData = {
+      // June 2025 weather data (simulated)
+      "2025-06": [
+        { date: 1, high: 24, low: 17, weather: "clouds" },
+        { date: 2, high: 25, low: 17, weather: "clouds" },
+        { date: 3, high: 22, low: 18, weather: "rain" },
+        { date: 4, high: 28, low: 19, weather: "clouds" },
+        { date: 5, high: 27, low: 19, weather: "clear" },
+        { date: 6, high: 29, low: 20, weather: "clouds" },
+        { date: 7, high: 29, low: 22, weather: "clouds" },
+        { date: 8, high: 28, low: 22, weather: "rain" },
+        { date: 9, high: 27, low: 20, weather: "rain" },
+        { date: 10, high: 24, low: 20, weather: "rain" },
+        { date: 11, high: 25, low: 22, weather: "rain" },
+        { date: 12, high: 29, low: 22, weather: "clouds" },
+        { date: 13, high: 27, low: 22, weather: "clouds" },
+        { date: 14, high: 26, low: 22, weather: "rain" },
+        { date: 15, high: 31, low: 23, weather: "rain" },
+        { date: 16, high: 31, low: 25, weather: "clouds" },
+        { date: 17, high: 35, low: 25, weather: "clear" },
+        { date: 18, high: 36, low: 26, weather: "clouds" },
+        { date: 19, high: 34, low: 25, weather: "clouds" },
+        { date: 20, high: 33, low: 25, weather: "clouds" },
+        { date: 21, high: 32, low: 23, weather: "clouds" },
+        { date: 22, high: 35, low: 25, weather: "clouds" },
+        { date: 23, high: 33, low: 27, weather: "clouds" },
+        { date: 24, high: 30, low: 25, weather: "clouds" },
+        { date: 25, high: 30, low: 25, weather: "rain" },
+        { date: 26, high: 31, low: 26, weather: "clouds" },
+        { date: 27, high: 31, low: 26, weather: "clouds" },
+        { date: 28, high: 33, low: 25, weather: "clear" },
+        { date: 29, high: 33, low: 26, weather: "clouds" },
+        { date: 30, high: 32, low: 26, weather: "clouds" }
+      ],
+      // Add more months as needed
+      "2025-07": [],
+      "2025-08": [],
+      "2025-09": [],
+      "2025-10": [],
+      "2025-11": [],
+      "2025-12": [],
+      "2026-01": [],
+      "2026-02": [],
+      "2026-03": [],
+      "2026-04": [],
+      "2026-05": []
+    };
+
+    // Function to get weather icon path
+    function getWeatherIcon(weather) {
+      const iconMap = {
+        "clear": "weather-app-main/images/clear.png",
+        "clouds": "weather-app-main/images/clouds.png",
+        "rain": "weather-app-main/images/rain.png",
+        "snow": "weather-app-main/images/snow.png",
+        "thunder": "weather-app-main/images/thunder.png"
+      };
+      return iconMap[weather] || iconMap["clouds"];
+    }
+
+    // Function to generate calendar for a specific month
+    function generateCalendar(year, month) {
+      const calendarGrid = document.getElementById("calendar-grid");
+      calendarGrid.innerHTML = "";
+
+      // Get the first day of the month
+      const firstDay = new Date(year, month, 1);
+      const startingDay = firstDay.getDay(); // 0 = Sunday, 1 = Monday, etc.
+
+      // Get the number of days in the month
+      const lastDay = new Date(year, month + 1, 0);
+      const totalDays = lastDay.getDate();
+
+      // Get the weather data for this month
+      const monthKey = `${year}-${String(month + 1).padStart(2, '0')}`;
+      const monthData = weatherData[monthKey] || [];
+
+      // Create empty cells for days before the first day of the month
+      for (let i = 0; i < startingDay; i++) {
+        const emptyDay = document.createElement("div");
+        emptyDay.className = "calendar-day next-month";
+        calendarGrid.appendChild(emptyDay);
+      }
+
+      // Create cells for each day of the month
+      for (let day = 1; day <= totalDays; day++) {
+        const dayCell = document.createElement("div");
+        dayCell.className = "calendar-day";
+
+        const dateDiv = document.createElement("div");
+        dateDiv.className = "date";
+        dateDiv.textContent = day;
+        dayCell.appendChild(dateDiv);
+
+        // Find weather data for this day
+        const dayData = monthData.find(d => d.date === day);
+        
+        if (dayData) {
+          const weatherIcon = document.createElement("img");
+          weatherIcon.className = "weather-icon";
+          weatherIcon.src = getWeatherIcon(dayData.weather);
+          weatherIcon.alt = dayData.weather;
+          dayCell.appendChild(weatherIcon);
+
+          const tempHigh = document.createElement("div");
+          tempHigh.className = "temp-high";
+          tempHigh.textContent = `${dayData.high}°`;
+          dayCell.appendChild(tempHigh);
+
+          const tempLow = document.createElement("div");
+          tempLow.className = "temp-low";
+          tempLow.textContent = `${dayData.low}°`;
+          dayCell.appendChild(tempLow);
+        }
+
+        calendarGrid.appendChild(dayCell);
+      }
+
+      // Fill remaining cells with next month's days
+      const totalCells = 42; // 6 rows of 7 days
+      const remainingCells = totalCells - (startingDay + totalDays);
+      
+      for (let i = 1; i <= remainingCells; i++) {
+        if (i > 7) break; // Only show one additional row if needed
+        
+        const nextMonthDay = document.createElement("div");
+        nextMonthDay.className = "calendar-day next-month";
+        
+        const dateDiv = document.createElement("div");
+        dateDiv.className = "date";
+        dateDiv.textContent = i;
+        nextMonthDay.appendChild(dateDiv);
+        
+        calendarGrid.appendChild(nextMonthDay);
+      }
+    }
+
+    // Initialize calendar with current month
+    const currentDate = new Date();
+    let currentYear = 2025; // Hardcoded for demo
+    let currentMonth = 5; // June (0-based index)
+
+    generateCalendar(currentYear, currentMonth);
+
+    // Add event listeners to month buttons
+    document.querySelectorAll('.month-btn').forEach(button => {
+      button.addEventListener('click', function() {
+        // Remove active class from all buttons
+        document.querySelectorAll('.month-btn').forEach(btn => {
+          btn.classList.remove('active');
+        });
+        
+        // Add active class to clicked button
+        this.classList.add('active');
+        
+        // Get month from data attribute
+        const month = parseInt(this.getAttribute('data-month'));
+        currentMonth = month;
+        
+        // Adjust year if needed
+        currentYear = month >= 5 ? 2025 : 2026;
+        
+        // Generate calendar for selected month
+        generateCalendar(currentYear, currentMonth);
+      });
+    });
+
+    // Navigation between pages
+    document.getElementById('home-icon').onclick = function() {
+      window.location.href = 'weather-app-main/index.html';
+    };
+    
+    document.getElementById('weather-map-icon').onclick = function() {
+      window.location.href = 'weather-app-main/maps.html';
+    };
+    
+    document.getElementById('time-icon').onclick = function() {
+      window.location.href = 'weather-app-main/time.html';
+    };
+    
+    document.getElementById('calendar-icon').onclick = function() {
+      window.location.href = 'monthly forecast.html';
+    };
+  </script>
+</body>
+</html>
