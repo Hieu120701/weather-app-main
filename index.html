@@ -639,19 +639,7 @@
         L.tileLayer(`https://tile.openweathermap.org/map/clouds_new/{z}/{x}/{y}.png?appid=${apikey}`).addTo(window.weatherMap);
       }
 
-      // Lấy cảnh báo/thời tiết tại Hà Nội
-      fetch(`https://api.openweathermap.org/data/2.5/weather?lat=21.0285&lon=105.8542&appid=${apikey}&lang=vi`)
-        .then(res => res.json())
-        .then(data => {
-          let alertText = '';
-          if (data.weather && data.weather.length > 0) {
-            alertText += 'Thời tiết: ' + data.weather[0].description;
-          }
-          if (data.alerts && data.alerts.length > 0) {
-            alertText += '\nCảnh báo: ' + data.alerts[0].description;
-          }
-          document.getElementById('weather-alert').textContent = alertText;
-        });
+     
     }
   </script>
 </body>
