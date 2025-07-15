@@ -1,34 +1,41 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ja">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Weather Map</title>
+  <title>天気地図</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Inter:wght@400;600;900&display=swap">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
   <style>
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
+    :root {
+      --primary: #3a8fff;
+      --primary-dark: #2665d4;
+      --glass: rgba(34,44,70,0.74);
+      --glass-light: rgba(255,255,255,0.13);
+      --sidebar-width: 74px;
+      --shadow: 0 8px 32px 0 rgba(31,38,135,0.18);
+      --font-main: 'Inter', 'Segoe UI', 'Noto Sans JP', Arial, sans-serif;
     }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
 
     html, body {
       height: 100%;
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      font-family: var(--font-main);
     }
 
     body {
       display: flex;
       flex-direction: row;
       min-height: 100vh;
-      background: #f8fafc;
+      background: radial-gradient(ellipse at 60% 20%, #2e468c 0%, #232c4b 55%, #181b25 100%);
+      color: #f2f7fa;
     }
 
     /* Sidebar Styles */
     .sidebar {
-      width: 56px;
-      background: rgba(35, 43, 57, 0.95);
-      backdrop-filter: blur(10px);
+      width: var(--sidebar-width);
+      background: var(--glass);
+      backdrop-filter: blur(18px);
       display: flex;
       flex-direction: column;
       align-items: center;
@@ -39,16 +46,17 @@
       bottom: 0;
       height: 100vh;
       z-index: 100;
-      box-shadow: 2px 0 12px rgba(0, 0, 0, 0.1);
+      box-shadow: 6px 0 32px 0 rgba(58, 143, 255, 0.11);
+      border-right: 1.5px solid rgba(255,255,255,0.10);
     }
 
     .sidebar-content {
       display: flex;
       flex-direction: column;
-      gap: 12px;
+      gap: 28px;
       width: 100%;
       align-items: center;
-      padding: 20px 0;
+      padding: 32px 0;
     }
 
     .sidebar-item {
@@ -56,31 +64,31 @@
       display: flex;
       justify-content: center;
       align-items: center;
-      height: 40px;
+      height: 54px;
+      background: none;
+      outline: none;
+      border: none;
+      cursor: pointer;
     }
 
     .sidebar-icon {
-      font-size: 18px;
-      color: #cbd5e1;
-      cursor: pointer;
-      transition: all 0.3s ease;
+      font-size: 29px;
+      color: #b6c7e3;
+      transition: color 0.2s, background 0.2s, box-shadow 0.2s;
+      width: 44px;
+      height: 44px;
+      border-radius: 15px;
       display: flex;
       align-items: center;
       justify-content: center;
-      width: 32px;
-      height: 32px;
-      border-radius: 8px;
-      position: relative;
+      background: transparent;
+      border: 1.5px solid transparent;
     }
-
-    .sidebar-icon:hover {
-      color: #38bdf8;
-      background: rgba(30, 41, 59, 0.8);
-      transform: scale(1.1);
-    }
-
-    .sidebar-icon:active {
-      transform: scale(0.95);
+    .sidebar-icon:hover, .sidebar-item.active .sidebar-icon {
+      background: var(--glass-light);
+      color: var(--primary);
+      border-color: var(--primary);
+      box-shadow: 0 4px 14px var(--glass-light);
     }
 
     /* Main Content Styles */
@@ -89,16 +97,51 @@
       min-width: 0;
       height: 100vh;
       position: relative;
-      margin-left: 56px;
+      margin-left: var(--sidebar-width);
       overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      align-items: stretch;
+    }
+
+    .tab-menu {
+      display: flex;
+      gap: 16px;
+      justify-content: center;
+      margin: 32px auto 18px auto;
+      width: 100%;
+      max-width: 540px;
+      z-index: 2;
+      position: relative;
+    }
+    .tab-btn {
+      background: transparent;
+      color: var(--primary);
+      border: 1.7px solid var(--primary);
+      border-radius: 999px;
+      padding: 10px 32px;
+      font-weight: 700;
+      font-size: 1.13rem;
+      cursor: pointer;
+      transition: background 0.17s, color 0.17s, border 0.17s;
+      box-shadow: 0 2px 8px 0 rgba(58,143,255,.08);
+      outline: none;
+    }
+    .tab-btn.active, .tab-btn:hover {
+      background: var(--primary);
+      color: #fff;
+      border-color: var(--primary-dark);
     }
 
     #windy-map {
       width: 100%;
-      height: 100vh;
+      height: calc(100vh - 100px);
       border: none;
       display: block;
       background: #f1f5f9;
+      border-radius: 28px;
+      box-shadow: 0 8px 32px 0 rgba(31,38,135,0.13);
+      margin: 0 auto;
     }
 
     /* Loading State */
@@ -135,20 +178,17 @@
     }
 
     /* Responsive Design */
-    @media (max-width: 768px) {
-      .sidebar {
-        width: 48px;
-      }
-      
-      .main-map-content {
-        margin-left: 48px;
-      }
-      
-      .sidebar-icon {
-        width: 28px;
-        height: 28px;
-        font-size: 16px;
-      }
+    @media (max-width: 900px) {
+      .sidebar { width: 49px; }
+      .sidebar-content { padding: 18px 0; gap: 19px; }
+      .main-map-content { margin-left: 49px; }
+      .sidebar-icon { width: 30px; height: 30px; font-size: 20px; }
+      .tab-menu { gap: 7px; padding: 0 4px; }
+      #windy-map { border-radius: 18px; }
+    }
+    @media (max-width: 600px) {
+      .tab-menu { flex-wrap: wrap; gap: 4px; font-size: 0.95rem; }
+      #windy-map { height: calc(100vh - 95px); border-radius: 10px; }
     }
   </style>
 </head>
@@ -156,33 +196,43 @@
   <!-- Sidebar Navigation -->
   <div class="sidebar">
     <div class="sidebar-content">
-      <div class="sidebar-item" id="home-icon" title="Home">
+      <button class="sidebar-item" id="home-icon" title="ホーム">
         <i class="fa-solid fa-house sidebar-icon"></i>
-      </div>
-      <div class="sidebar-item" id="weather-map-icon" title="Weather Map">
+      </button>
+      <button class="sidebar-item active" id="weather-map-icon" title="天気地図">
         <i class="fa-solid fa-bullseye sidebar-icon"></i>
-      </div>
-      <div class="sidebar-item" id="time-icon" title="Time">
+      </button>
+      <button class="sidebar-item" id="time-icon" title="時間">
         <i class="fa-regular fa-clock sidebar-icon"></i>
-      </div>
-      <div class="sidebar-item" id="calendar-icon" title="Calendar">
+      </button>
+      <button class="sidebar-item" id="calendar-icon" title="カレンダー">
         <i class="fa-regular fa-calendar sidebar-icon"></i>
-      </div>
-      <div class="sidebar-item" id="cloud-icon" title="Weather Alerts">
+      </button>
+      <button class="sidebar-item" id="cloud-icon" title="天気警報">
         <i class="fa-solid fa-cloud sidebar-icon"></i>
-      </div>
-      <div class="sidebar-item" id="smile-icon" title="Notes">
+      </button>
+      <button class="sidebar-item" id="smile-icon" title="メモ">
         <i class="fa-regular fa-face-smile sidebar-icon"></i>
-      </div>
+      </button>
     </div>
   </div>
 
   <!-- Main Map Content -->
   <div class="main-map-content">
+    <!-- Tab menu giống phần index -->
+    <nav class="tab-menu" aria-label="地図レイヤー">
+      <button class="tab-btn active" data-overlay="rain">雨</button>
+      <button class="tab-btn" data-overlay="wind">風</button>
+      <button class="tab-btn" data-overlay="temp">気温</button>
+      <button class="tab-btn" data-overlay="clouds">雲</button>
+      <button class="tab-btn" data-overlay="pressure">気圧</button>
+      <button class="tab-btn" data-overlay="snow">雪</button>
+      <button class="tab-btn" data-overlay="radar">レーダー</button>
+    </nav>
     <!-- Loading State -->
     <div class="loading" id="loading">
       <div class="loading-spinner"></div>
-      <div class="loading-text">Loading weather map...</div>
+      <div class="loading-text">天気地図を読み込み中...</div>
     </div>
 
     <!-- Windy Map Embed -->
@@ -205,19 +255,18 @@
       smile: () => window.location.href = 'note.html'
     };
 
-    // Event Listeners
+    // Sidebar navigation
     document.addEventListener('DOMContentLoaded', function() {
-      // Sidebar navigation
       document.getElementById('home-icon').addEventListener('click', navigation.home);
       document.getElementById('weather-map-icon').addEventListener('click', navigation.weatherMap);
       document.getElementById('time-icon').addEventListener('click', navigation.time);
       document.getElementById('calendar-icon').addEventListener('click', navigation.calendar);
       document.getElementById('cloud-icon').addEventListener('click', navigation.cloud);
-      
+      document.getElementById('smile-icon').addEventListener('click', navigation.smile);
+
       // Hide loading when iframe loads
       const iframe = document.getElementById('windy-map');
       const loading = document.getElementById('loading');
-      
       iframe.addEventListener('load', function() {
         loading.style.display = 'none';
       });
@@ -227,9 +276,23 @@
         loading.innerHTML = `
           <div style="color: #ef4444; text-align: center;">
             <i class="fa-solid fa-exclamation-triangle" style="font-size: 24px; margin-bottom: 8px;"></i>
-            <div>Failed to load weather map</div>
+            <div>天気地図の読み込みに失敗しました</div>
           </div>
         `;
+      });
+
+      // Tab menu - đổi lớp overlay của windy map
+      document.querySelectorAll('.tab-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+          document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+          this.classList.add('active');
+          const overlay = this.dataset.overlay;
+
+          // Xây lại URL với lớp overlay mới
+          const url = `https://embed.windy.com/embed2.html?lat=25&lon=135&zoom=5&level=surface&overlay=${overlay}&menu=&message=true&marker=&calendar=now&pressure=&type=map&location=coordinates&detail=&metricWind=default&metricTemp=default&radarRange=-1`;
+          iframe.src = url;
+          loading.style.display = 'flex';
+        });
       });
     });
 
@@ -237,30 +300,12 @@
     document.addEventListener('keydown', function(e) {
       if (e.ctrlKey || e.metaKey) {
         switch(e.key) {
-          case '1':
-            e.preventDefault();
-            navigation.home();
-            break;
-          case '2':
-            e.preventDefault();
-            navigation.weatherMap();
-            break;
-          case '3':
-            e.preventDefault();
-            navigation.time();
-            break;
-          case '4':
-            e.preventDefault();
-            navigation.calendar();
-            break;
-          case '5':
-            e.preventDefault();
-            navigation.cloud();
-            break;
-          case '6':
-            e.preventDefault();
-            navigation.smile();
-            break;
+          case '1': e.preventDefault(); navigation.home(); break;
+          case '2': e.preventDefault(); navigation.weatherMap(); break;
+          case '3': e.preventDefault(); navigation.time(); break;
+          case '4': e.preventDefault(); navigation.calendar(); break;
+          case '5': e.preventDefault(); navigation.cloud(); break;
+          case '6': e.preventDefault(); navigation.smile(); break;
         }
       }
     });
