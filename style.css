@@ -20,13 +20,14 @@
 }
 
 body {
-  background: linear-gradient(135deg, #232c4b 0%, #3a8fff 100%);
+  min-height: 100vh;
+  background: radial-gradient(ellipse at 60% 20%, #2e468c 0%, #232c4b 55%, #181b25 100%);
+  background-color: #232c4b;
   color: var(--text-main);
   font-family: var(--font-main);
-  min-height: 100vh;
   display: flex;
   flex-direction: row;
-  transition: background 0.5s, color 0.5s;
+  transition: background 0.6s, color 0.6s;
 }
 
 body.light-mode {
