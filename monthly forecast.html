@@ -278,16 +278,10 @@
       <div class="sidebar-item active" id="calendar-icon">
         <i class="fa-regular fa-calendar sidebar-icon"></i>
       </div>
-      <div class="sidebar-item">
+      <div class="sidebar-item" id="cloud-icon">
         <i class="fa-solid fa-cloud sidebar-icon"></i>
       </div>
-      <div class="sidebar-item">
-        <i class="fa-solid fa-chart-line sidebar-icon"></i>
-      </div>
-      <div class="sidebar-item">
-        <i class="fa-regular fa-star sidebar-icon"></i>
-      </div>
-      <div class="sidebar-item">
+      <div class="sidebar-item" id="smile-icon">
         <i class="fa-regular fa-face-smile sidebar-icon"></i>
       </div>
     </div>
@@ -297,7 +291,12 @@
   <div class="main-content">
     <div class="location-header">
       <i class="fa-solid fa-location-dot"></i>
-      <span id="location-name">神奈川県, 横浜市</span>
+      <select id="location-select">
+        <option value="yokohama">神奈川県, 横浜市</option>
+        <option value="tokyo">東京都, 東京</option>
+        <option value="osaka">大阪府, 大阪</option>
+        <!-- Thêm các tỉnh/thành khác -->
+      </select>
     </div>
 
     <div class="month-navigation">
@@ -356,84 +355,209 @@
   <script>
     // Weather data (simulated for demonstration)
     const weatherData = {
-     // July 2025 weather data (current month) - Updated with realistic Yokohama weather patterns
-      "2025-07": [
-        { date: 1, high: 26, low: 22, weather: "rain" },
-        { date: 2, high: 28, low: 23, weather: "clouds" },
-        { date: 3, high: 30, low: 24, weather: "clouds" },
-        { date: 4, high: 31, low: 25, weather: "clear" },
-        { date: 5, high: 33, low: 26, weather: "clear" },
-        { date: 6, high: 32, low: 25, weather: "clouds" },
-        { date: 7, high: 29, low: 23, weather: "rain" },
-        { date: 8, high: 27, low: 22, weather: "rain" },
-        { date: 9, high: 30, low: 24, weather: "clouds" },
-        { date: 10, high: 32, low: 25, weather: "clear" },
-        { date: 11, high: 34, low: 26, weather: "clear" },
-        { date: 12, high: 35, low: 27, weather: "clear" },
-        { date: 13, high: 33, low: 26, weather: "clouds" },
-        { date: 14, high: 31, low: 24, weather: "clouds" },
-        { date: 15, high: 29, low: 23, weather: "rain" },
-        { date: 16, high: 28, low: 22, weather: "rain" },
-        { date: 17, high: 30, low: 24, weather: "clouds" },
-        { date: 18, high: 32, low: 25, weather: "clear" },
-        { date: 19, high: 34, low: 26, weather: "clear" },
-        { date: 20, high: 36, low: 28, weather: "clear" },
-        { date: 21, high: 35, low: 27, weather: "clear" },
-        { date: 22, high: 33, low: 26, weather: "clouds" },
-        { date: 23, high: 31, low: 25, weather: "clouds" },
-        { date: 24, high: 30, low: 24, weather: "rain" },
-        { date: 25, high: 28, low: 23, weather: "rain" },
-        { date: 26, high: 29, low: 23, weather: "clouds" },
-        { date: 27, high: 31, low: 24, weather: "clouds" },
-        { date: 28, high: 33, low: 25, weather: "clear" },
-        { date: 29, high: 34, low: 26, weather: "clear" },
-        { date: 30, high: 32, low: 25, weather: "clouds" },
-        { date: 31, high: 30, low: 24, weather: "rain" }
-      ],
-      // June 2025 weather data
-      "2025-06": [
-        { date: 1, high: 24, low: 17, weather: "clouds" },
-        { date: 2, high: 25, low: 17, weather: "clouds" },
-        { date: 3, high: 22, low: 18, weather: "rain" },
-        { date: 4, high: 28, low: 19, weather: "clouds" },
-        { date: 5, high: 27, low: 19, weather: "clear" },
-        { date: 6, high: 29, low: 20, weather: "clouds" },
-        { date: 7, high: 29, low: 22, weather: "clouds" },
-        { date: 8, high: 28, low: 22, weather: "rain" },
-        { date: 9, high: 27, low: 20, weather: "rain" },
-        { date: 10, high: 24, low: 20, weather: "rain" },
-        { date: 11, high: 25, low: 22, weather: "rain" },
-        { date: 12, high: 29, low: 22, weather: "clouds" },
-        { date: 13, high: 27, low: 22, weather: "clouds" },
-        { date: 14, high: 26, low: 22, weather: "rain" },
-        { date: 15, high: 31, low: 23, weather: "rain" },
-        { date: 16, high: 31, low: 25, weather: "clouds" },
-        { date: 17, high: 35, low: 25, weather: "clear" },
-        { date: 18, high: 36, low: 26, weather: "clouds" },
-        { date: 19, high: 34, low: 25, weather: "clouds" },
-        { date: 20, high: 33, low: 25, weather: "clouds" },
-        { date: 21, high: 32, low: 23, weather: "clouds" },
-        { date: 22, high: 35, low: 25, weather: "clouds" },
-        { date: 23, high: 33, low: 27, weather: "clouds" },
-        { date: 24, high: 30, low: 25, weather: "clouds" },
-        { date: 25, high: 30, low: 25, weather: "rain" },
-        { date: 26, high: 31, low: 26, weather: "clouds" },
-        { date: 27, high: 31, low: 26, weather: "clouds" },
-        { date: 28, high: 33, low: 25, weather: "clear" },
-        { date: 29, high: 33, low: 26, weather: "clouds" },
-        { date: 30, high: 32, low: 26, weather: "clouds" }
-      ],
-      // Add more months as needed
-      "2025-08": [],
-      "2025-09": [],
-      "2025-10": [],
-      "2025-11": [],
-      "2025-12": [],
-      "2026-01": [],
-      "2026-02": [],
-      "2026-03": [],
-      "2026-04": [],
-      "2026-05": []
+  yokohama: {
+    "2025-07": [
+      { date: 1, high: 29, low: 23, weather: "rain" },
+      { date: 2, high: 28, low: 23, weather: "rain" },
+      { date: 3, high: 29, low: 24, weather: "clouds" },
+      { date: 4, high: 30, low: 25, weather: "clouds" },
+      { date: 5, high: 31, low: 25, weather: "clear" },
+      { date: 6, high: 32, low: 26, weather: "clear" },
+      { date: 7, high: 33, low: 27, weather: "clear" },
+      { date: 8, high: 34, low: 27, weather: "clear" },
+      { date: 9, high: 34, low: 27, weather: "clear" },
+      { date: 10, high: 33, low: 26, weather: "clear" },
+      { date: 11, high: 32, low: 26, weather: "clouds" },
+      { date: 12, high: 31, low: 25, weather: "clouds" },
+      { date: 13, high: 30, low: 25, weather: "rain" },
+      { date: 14, high: 29, low: 24, weather: "rain" },
+      { date: 15, high: 30, low: 25, weather: "clouds" },
+      { date: 16, high: 31, low: 26, weather: "clear" },
+      { date: 17, high: 32, low: 27, weather: "clear" },
+      { date: 18, high: 33, low: 27, weather: "clear" },
+      { date: 19, high: 34, low: 28, weather: "clear" },
+      { date: 20, high: 35, low: 28, weather: "clear" },
+      { date: 21, high: 35, low: 28, weather: "clear" },
+      { date: 22, high: 34, low: 27, weather: "clouds" },
+      { date: 23, high: 33, low: 26, weather: "clouds" },
+      { date: 24, high: 32, low: 25, weather: "rain" },
+      { date: 25, high: 31, low: 25, weather: "rain" },
+      { date: 26, high: 30, low: 24, weather: "clouds" },
+      { date: 27, high: 29, low: 24, weather: "clouds" },
+      { date: 28, high: 30, low: 25, weather: "clear" },
+      { date: 29, high: 31, low: 25, weather: "clear" },
+      { date: 30, high: 32, low: 26, weather: "clear" },
+      { date: 31, high: 33, low: 27, weather: "clear" }
+    ],
+    "2025-08": [
+      { date: 1, high: 34, low: 27, weather: "clear" },
+      { date: 2, high: 35, low: 28, weather: "clear" },
+      { date: 3, high: 36, low: 28, weather: "clear" },
+      { date: 4, high: 35, low: 28, weather: "clear" },
+      { date: 5, high: 34, low: 27, weather: "clear" },
+      { date: 6, high: 33, low: 27, weather: "clouds" },
+      { date: 7, high: 32, low: 26, weather: "clouds" },
+      { date: 8, high: 31, low: 26, weather: "rain" },
+      { date: 9, high: 30, low: 25, weather: "rain" },
+      { date: 10, high: 31, low: 25, weather: "clouds" },
+      { date: 11, high: 32, low: 26, weather: "clear" },
+      { date: 12, high: 33, low: 27, weather: "clear" },
+      { date: 13, high: 34, low: 27, weather: "clear" },
+      { date: 14, high: 35, low: 28, weather: "clear" },
+      { date: 15, high: 36, low: 28, weather: "clear" },
+      { date: 16, high: 35, low: 28, weather: "clear" },
+      { date: 17, high: 34, low: 27, weather: "clouds" },
+      { date: 18, high: 33, low: 27, weather: "clouds" },
+      { date: 19, high: 32, low: 26, weather: "rain" },
+      { date: 20, high: 31, low: 25, weather: "rain" },
+      { date: 21, high: 30, low: 25, weather: "clouds" },
+      { date: 22, high: 31, low: 25, weather: "clear" },
+      { date: 23, high: 32, low: 26, weather: "clear" },
+      { date: 24, high: 33, low: 27, weather: "clear" },
+      { date: 25, high: 34, low: 27, weather: "clear" },
+      { date: 26, high: 35, low: 28, weather: "clear" },
+      { date: 27, high: 36, low: 28, weather: "clear" },
+      { date: 28, high: 35, low: 28, weather: "clear" },
+      { date: 29, high: 34, low: 27, weather: "clouds" },
+      { date: 30, high: 33, low: 27, weather: "clouds" },
+      { date: 31, high: 32, low: 26, weather: "rain" }
+    ],
+    // Add more months as needed
+    "2025-09": [],
+    "2025-10": [],
+    "2025-11": [],
+    "2025-12": [],
+    "2026-01": [],
+    "2026-02": [],
+    "2026-03": [],
+    "2026-04": [],
+    "2026-05": []
+  },
+  tokyo: {
+    "2025-07": [
+      { date: 1, high: 28, low: 22, weather: "clear" },
+      { date: 2, high: 29, low: 23, weather: "clear" },
+      { date: 3, high: 30, low: 24, weather: "clouds" },
+      { date: 4, high: 31, low: 25, weather: "clouds" },
+      { date: 5, high: 32, low: 26, weather: "rain" },
+      { date: 6, high: 33, low: 27, weather: "rain" },
+      { date: 7, high: 34, low: 28, weather: "clear" },
+      { date: 8, high: 35, low: 28, weather: "clear" },
+      { date: 9, high: 35, low: 28, weather: "clear" },
+      { date: 10, high: 34, low: 27, weather: "clear" },
+      { date: 11, high: 33, low: 27, weather: "clouds" },
+      { date: 12, high: 32, low: 26, weather: "clouds" },
+      { date: 13, high: 31, low: 26, weather: "rain" },
+      { date: 14, high: 30, low: 25, weather: "rain" },
+      { date: 15, high: 31, low: 26, weather: "clouds" },
+      { date: 16, high: 32, low: 27, weather: "clear" },
+      { date: 17, high: 33, low: 28, weather: "clear" },
+      { date: 18, high: 34, low: 28, weather: "clear" },
+      { date: 19, high: 35, low: 29, weather: "clear" },
+      { date: 20, high: 36, low: 29, weather: "clear" },
+      { date: 21, high: 36, low: 29, weather: "clear" },
+      { date: 22, high: 35, low: 28, weather: "clouds" },
+      { date: 23, high: 34, low: 27, weather: "clouds" },
+      { date: 24, high: 33, low: 26, weather: "rain" },
+      { date: 25, high: 32, low: 26, weather: "rain" },
+      { date: 26, high: 31, low: 25, weather: "clouds" },
+      { date: 27, high: 30, low: 25, weather: "clouds" },
+      { date: 28, high: 31, low: 26, weather: "clear" },
+      { date: 29, high: 32, low: 26, weather: "clear" },
+      { date: 30, high: 33, low: 27, weather: "clear" },
+      { date: 31, high: 34, low: 28, weather: "clear" }
+    ],
+    "2025-08": [
+      { date: 1, high: 35, low: 28, weather: "clear" },
+      { date: 2, high: 36, low: 29, weather: "clear" },
+      { date: 3, high: 37, low: 29, weather: "clear" },
+      { date: 4, high: 36, low: 29, weather: "clear" },
+      { date: 5, high: 35, low: 28, weather: "clear" },
+      { date: 6, high: 34, low: 28, weather: "clouds" },
+      { date: 7, high: 33, low: 27, weather: "clouds" },
+      { date: 8, high: 32, low: 27, weather: "rain" },
+      { date: 9, high: 31, low: 26, weather: "rain" },
+      { date: 10, high: 32, low: 26, weather: "clouds" },
+      { date: 11, high: 33, low: 27, weather: "clear" },
+      { date: 12, high: 34, low: 28, weather: "clear" },
+      { date: 13, high: 35, low: 28, weather: "clear" },
+      { date: 14, high: 36, low: 29, weather: "clear" },
+      { date: 15, high: 37, low: 29, weather: "clear" },
+      { date: 16, high: 36, low: 29, weather: "clear" },
+      { date: 17, high: 35, low: 28, weather: "clouds" },
+      { date: 18, high: 34, low: 28, weather: "clouds" },
+      { date: 19, high: 33, low: 27, weather: "rain" },
+      { date: 20, high: 32, low: 26, weather: "rain" },
+      { date: 21, high: 31, low: 26, weather: "clouds" },
+      { date: 22, high: 32, low: 26, weather: "clear" },
+      { date: 23, high: 33, low: 27, weather: "clear" },
+      { date: 24, high: 34, low: 28, weather: "clear" },
+      { date: 25, high: 35, low: 28, weather: "clear" },
+      { date: 26, high: 36, low: 29, weather: "clear" },
+      { date: 27, high: 37, low: 29, weather: "clear" },
+      { date: 28, high: 36, low: 29, weather: "clear" },
+      { date: 29, high: 35, low: 28, weather: "clouds" },
+      { date: 30, high: 34, low: 28, weather: "clouds" },
+      { date: 31, high: 33, low: 27, weather: "rain" }
+    ],
+    // Add more months as needed
+    "2025-09": [],
+    "2025-10": [],
+    "2025-11": [],
+    "2025-12": [],
+    "2026-01": [],
+    "2026-02": [],
+    "2026-03": [],
+    "2026-04": [],
+    "2026-05": []
+  },
+  osaka: {
+    "2025-07": [
+      { date: 1, high: 30, low: 24, weather: "rain" },
+      { date: 2, high: 29, low: 24, weather: "rain" },
+      { date: 3, high: 30, low: 25, weather: "clouds" },
+      { date: 4, high: 31, low: 26, weather: "clouds" },
+      { date: 5, high: 32, low: 26, weather: "clear" },
+      { date: 6, high: 33, low: 27, weather: "clear" },
+      { date: 7, high: 34, low: 28, weather: "clear" },
+      { date: 8, high: 35, low: 28, weather: "clear" },
+      { date: 9, high: 35, low: 28, weather: "clear" },
+      { date: 10, high: 34, low: 27, weather: "clear" },
+      { date: 11, high: 33, low: 27, weather: "clouds" },
+      { date: 12, high: 32, low: 26, weather: "clouds" },
+      { date: 13, high: 31, low: 26, weather: "rain" },
+      { date: 14, high: 30, low: 25, weather: "rain" },
+      { date: 15, high: 31, low: 26, weather: "clouds" },
+      { date: 16, high: 32, low: 27, weather: "clear" },
+      { date: 17, high: 33, low: 28, weather: "clear" },
+      { date: 18, high: 34, low: 28, weather: "clear" },
+      { date: 19, high: 35, low: 29, weather: "clear" },
+      { date: 20, high: 36, low: 29, weather: "clear" },
+      { date: 21, high: 36, low: 29, weather: "clear" },
+      { date: 22, high: 35, low: 28, weather: "clouds" },
+      { date: 23, high: 34, low: 27, weather: "clouds" },
+      { date: 24, high: 33, low: 26, weather: "rain" },
+      { date: 25, high: 32, low: 26, weather: "rain" },
+      { date: 26, high: 31, low: 25, weather: "clouds" },
+      { date: 27, high: 30, low: 25, weather: "clouds" },
+      { date: 28, high: 31, low: 26, weather: "clear" },
+      { date: 29, high: 32, low: 26, weather: "clear" },
+      { date: 30, high: 33, low: 27, weather: "clear" },
+      { date: 31, high: 34, low: 28, weather: "clear" }
+    ],
+    // Add more months as needed
+    "2025-08": [],
+    "2025-09": [],
+    "2025-10": [],
+    "2025-11": [],
+    "2025-12": [],
+    "2026-01": [],
+    "2026-02": [],
+    "2026-03": [],
+    "2026-04": [],
+    "2026-05": []
+  }
+  // Thêm các tỉnh/thành khác
     };
 
     // Function to get weather icon URL
@@ -482,7 +606,7 @@
     }
 
     // Function to generate calendar for a specific month
-    function generateCalendar(year, month) {
+    function generateCalendar(location, year, month) {
       const calendarGrid = document.getElementById("calendar-grid");
       calendarGrid.innerHTML = "";
 
@@ -496,7 +620,7 @@
 
       // Get the weather data for this month
       const monthKey = `${year}-${String(month + 1).padStart(2, '0')}`;
-      const monthData = weatherData[monthKey] || [];
+      const monthData = weatherData[location][monthKey] || [];
 
       // Update monthly summary
       updateMonthlySummary(monthData);
@@ -560,10 +684,24 @@
     }
 
     // Initialize calendar with current month (July 2025)
-    let currentYear = 2025;
-    let currentMonth = 6; // July (0-based index)
+    let currentLocation = 'yokohama';
+let currentYear = 2025;
+let currentMonth = 6; // July
 
-    generateCalendar(currentYear, currentMonth);
+document.getElementById('location-select').addEventListener('change', function() {
+  currentLocation = this.value;
+  generateCalendar(currentLocation, currentYear, currentMonth);
+});
+
+// Khi đổi tháng
+function onMonthChange(month, year) {
+  currentMonth = month;
+  currentYear = year;
+  generateCalendar(currentLocation, currentYear, currentMonth);
+}
+
+// Khi load trang
+generateCalendar(currentLocation, currentYear, currentMonth);
 
     // Add event listeners to month buttons
     document.querySelectorAll('.month-btn').forEach(button => {
@@ -584,7 +722,7 @@
         currentYear = month >= 5 ? 2025 : 2026;
         
         // Generate calendar for selected month
-        generateCalendar(currentYear, currentMonth);
+        generateCalendar('yokohama', currentYear, currentMonth);
       });
     });
 
@@ -604,11 +742,43 @@
       window.location.href = 'time.html';
     });
     
-    // Calendar icon is already active (current page)
     document.getElementById('calendar-icon').addEventListener('click', function() {
       // Already on calendar page, maybe refresh or do nothing
       location.reload();
     });
+
+    // Location selection change
+    document.getElementById('location-select').addEventListener('change', function() {
+      const selectedLocation = this.value;
+      // Update weather data and calendar based on selected location
+      // For now, just log the selected location
+      console.log("Selected location:", selectedLocation);
+
+      // TODO: Update weather data and regenerate calendar for the selected location
+    });
+  </script>
+
+  <!-- Đặt script điều hướng ở cuối file, ngay trước </body> -->
+  <script>
+    // Sidebar navigation giống index.html
+    document.getElementById('home-icon').onclick = function() {
+      window.location.href = 'index.html';
+    };
+    document.getElementById('weather-map-icon').onclick = function() {
+      window.location.href = 'maps.html';
+    };
+    document.getElementById('time-icon').onclick = function() {
+      window.location.href = 'time.html';
+    };
+    document.getElementById('calendar-icon').onclick = function() {
+      window.location.href = 'monthly forecast.html';
+    };
+    document.getElementById('cloud-icon').onclick = function() {
+      window.location.href = 'warning.html';
+    };
+    document.getElementById('smile-icon').onclick = function() {
+      window.location.href = 'note.html';
+    };
   </script>
 </body>
 </html>

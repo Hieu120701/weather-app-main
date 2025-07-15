@@ -2,20 +2,47 @@
 <html lang="ja">
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>1時間ごとの予報</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
   <style>
-    html, body { height: 100%; margin: 0; padding: 0; }
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    html, body {
+      height: 100%;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    }
+
     body {
       display: flex;
       flex-direction: row;
       min-height: 100vh;
-      background: url('images/background_time.jpg') no-repeat center center fixed;
-      background-size: cover;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      position: relative;
+      overflow-x: hidden;
     }
+
+    body::before {
+      content: '';
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><radialGradient id="a" cx="50%" cy="0%" r="100%"><stop offset="0%" style="stop-color:white;stop-opacity:0.1"/><stop offset="100%" style="stop-color:white;stop-opacity:0"/></radialGradient></defs><ellipse cx="50" cy="0" rx="50" ry="50" fill="url(%23a)"/></svg>') no-repeat center top;
+      background-size: 100% 50%;
+      z-index: 0;
+    }
+
+    /* Sidebar Styles */
     .sidebar {
       width: 56px;
-      background: #232b39cc;
+      background: rgba(35, 43, 57, 0.95);
+      backdrop-filter: blur(20px);
       display: flex;
       flex-direction: column;
       align-items: center;
@@ -26,174 +53,383 @@
       bottom: 0;
       height: 100vh;
       z-index: 100;
-      box-shadow: 2px 0 12px #0002;
+      box-shadow: 2px 0 24px rgba(0, 0, 0, 0.2);
+      border-right: 1px solid rgba(255, 255, 255, 0.1);
     }
+
     .sidebar-content {
       display: flex;
       flex-direction: column;
-      gap: 12px;           /* Đảm bảo giống nhau */
+      gap: 16px;
       width: 100%;
       align-items: center;
-      padding: 12px 0;     /* Thêm padding trên/dưới nếu cần */
+      padding: 20px 0;
     }
+
     .sidebar-item {
       width: 100%;
       display: flex;
       justify-content: center;
       align-items: center;
-      height: 48px;        /* Đảm bảo giống nhau */
+      height: 48px;
     }
+
     .sidebar-icon {
-      font-size: 22px;     /* Đảm bảo giống nhau */
+      font-size: 20px;
       color: #cbd5e1;
       cursor: pointer;
-      transition: color 0.2s, background 0.2s;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
       display: flex;
       align-items: center;
       justify-content: center;
-      width: 32px;         /* Đảm bảo giống nhau */
-      height: 32px;        /* Đảm bảo giống nhau */
-      border-radius: 8px;
+      width: 36px;
+      height: 36px;
+      border-radius: 12px;
       background: transparent;
+      position: relative;
     }
+
     .sidebar-icon:hover {
       color: #38bdf8;
-      background: #1e293b;
+      background: rgba(56, 189, 248, 0.1);
+      transform: scale(1.1);
+      box-shadow: 0 4px 12px rgba(56, 189, 248, 0.3);
     }
-    .main-content, .main-map-content {
+
+    .sidebar-icon:active {
+      transform: scale(0.95);
+    }
+
+    /* Main Content */
+    .main-content {
       margin-left: 56px;
-      flex: 1 1 0%;
+      flex: 1;
       min-width: 0;
       padding: 0;
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: flex-start;
+      position: relative;
+      z-index: 1;
     }
+
     .forecast-container {
-      max-width: 700px;
-      margin: 32px auto;
-      background: rgba(255,255,255,0.7);
-      border-radius: 16px;
-      box-shadow: 0 4px 24px #0002;
-      padding: 24px 0 16px 0;
-      width: 100%;
+      max-width: 800px;
+      margin: 40px auto;
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(20px);
+      border-radius: 24px;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+      padding: 0;
+      width: 95%;
+      overflow: hidden;
+      border: 1px solid rgba(255, 255, 255, 0.2);
     }
+
+    .forecast-header {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      padding: 24px;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .forecast-header::before {
+      content: '';
+      position: absolute;
+      top: -50%;
+      left: -50%;
+      width: 200%;
+      height: 200%;
+      background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+      animation: shimmer 3s ease-in-out infinite;
+    }
+
+    @keyframes shimmer {
+      0%, 100% { transform: translateX(-100%) translateY(-100%); }
+      50% { transform: translateX(0%) translateY(0%); }
+    }
+
+    .forecast-title {
+      font-size: 28px;
+      font-weight: 700;
+      margin-bottom: 8px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .forecast-subtitle {
+      font-size: 16px;
+      opacity: 0.9;
+      position: relative;
+      z-index: 1;
+    }
+
     .forecast-tabs {
       display: flex;
-      gap: 8px;
-      padding: 0 24px 16px 24px;
-      overflow-x: auto;
+      gap: 0;
+      padding: 0;
+      background: rgba(102, 126, 234, 0.1);
+      border-bottom: 1px solid rgba(102, 126, 234, 0.2);
     }
+
     .forecast-tab {
-      background: #1e40af;
-      color: #fff;
-      border-radius: 8px 8px 0 0;
-      padding: 8px 16px;
-      font-weight: 500;
+      background: transparent;
+      color: #667eea;
+      border: none;
+      padding: 16px 24px;
+      font-weight: 600;
       display: flex;
       align-items: center;
-      gap: 6px;
+      gap: 8px;
       cursor: pointer;
-      border: none;
       outline: none;
-      min-width: 80px;
-      transition: background 0.2s;
+      flex: 1;
+      transition: all 0.3s ease;
+      font-size: 16px;
     }
+
     .forecast-tab.active {
-      background: #2563eb;
-      color: #ffe066;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
     }
+
+    .forecast-tab:hover:not(.active) {
+      background: rgba(102, 126, 234, 0.1);
+    }
+
     .forecast-table {
       width: 100%;
       border-collapse: collapse;
       background: transparent;
       table-layout: fixed;
     }
-    .forecast-table th, .forecast-table td {
-      padding: 16px 0;
-      text-align: center;
-      border-bottom: 2px solid #a5b4fc;
-      border-right: 1px solid #a5b4fc;
-      font-size: 22px;
-      color: #222;
-      font-weight: 500;
-      background: rgba(255,255,255,0.7);
-    }
-    .forecast-table th:last-child,
-    .forecast-table td:last-child {
-      border-right: none;
-    }
+
     .forecast-table th {
-      color: #2563eb;
+      padding: 20px 16px;
+      text-align: center;
+      font-size: 16px;
+      color: #667eea;
       font-weight: 700;
-      font-size: 24px;
-      background: linear-gradient(90deg, #bae6fd 0%, #a5b4fc 100%);
-      /* hoặc background: #bae6fd; nếu muốn màu đơn sắc */
+      background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%);
+      border-bottom: 2px solid rgba(102, 126, 234, 0.2);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
     }
-    .forecast-table td img {
-      vertical-align: middle;
+
+    .forecast-table td {
+      padding: 20px 16px;
+      text-align: center;
+      border-bottom: 1px solid rgba(102, 126, 234, 0.1);
+      font-size: 16px;
+      color: #374151;
+      font-weight: 500;
+      background: rgba(255, 255, 255, 0.7);
+      transition: all 0.3s ease;
+    }
+
+    .forecast-table tbody tr:hover td {
+      background: rgba(102, 126, 234, 0.05);
+      transform: scale(1.02);
+    }
+
+    .forecast-table tbody tr:nth-child(even) td {
+      background: rgba(255, 255, 255, 0.9);
+    }
+
+    .forecast-table tbody tr:nth-child(even):hover td {
+      background: rgba(102, 126, 234, 0.08);
+    }
+
+    .weather-cell {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      font-weight: 600;
+    }
+
+    .weather-icon {
       width: 40px;
       height: 40px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      padding: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
     }
+
+    .weather-icon img {
+      width: 24px;
+      height: 24px;
+      filter: brightness(0) invert(1);
+    }
+
+    .temperature-cell {
+      font-weight: 700;
+      font-size: 18px;
+      color: #667eea;
+    }
+
     .wind-info {
       display: flex;
       align-items: center;
       gap: 8px;
       justify-content: center;
-      font-size: 22px;
-      height: 40px;
-      line-height: 40px;
+      font-size: 16px;
+      font-weight: 600;
+      color: #6b7280;
     }
+
     .wind-info i {
-      font-size: 28px;
-      line-height: 1;
+      font-size: 20px;
+      color: #667eea;
+      animation: spin 3s linear infinite;
     }
-    @media (max-width: 600px) {
-      .forecast-container { max-width: 100%; border-radius: 0; }
-      .forecast-table th, .forecast-table td { font-size: 16px; }
-      .forecast-table td img { width: 28px; height: 28px; }
-      .wind-info { font-size: 16px; height: 28px; line-height: 28px; }
-      .wind-info i { font-size: 20px; }
+
+    @keyframes spin {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(360deg); }
+    }
+
+    .time-cell {
+      font-weight: 700;
+      font-size: 16px;
+      color: #374151;
+    }
+
+    .loading-state {
+      text-align: center;
+      padding: 60px 20px;
+      color: #6b7280;
+    }
+
+    .loading-spinner {
+      width: 50px;
+      height: 50px;
+      border: 4px solid rgba(102, 126, 234, 0.1);
+      border-top: 4px solid #667eea;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+      margin: 0 auto 20px;
+    }
+
+    .error-state {
+      text-align: center;
+      padding: 60px 20px;
+      color: #ef4444;
+    }
+
+    .error-state i {
+      font-size: 48px;
+      margin-bottom: 16px;
+      opacity: 0.5;
+    }
+
+    /* Responsive Design */
+    @media (max-width: 768px) {
+      .sidebar {
+        width: 48px;
+      }
+      
+      .main-content {
+        margin-left: 48px;
+      }
+      
+      .forecast-container {
+        max-width: 100%;
+        margin: 20px 10px;
+        border-radius: 16px;
+        width: calc(100% - 20px);
+      }
+      
+      .forecast-title {
+        font-size: 22px;
+      }
+      
+      .forecast-table th,
+      .forecast-table td {
+        padding: 12px 8px;
+        font-size: 14px;
+      }
+      
+      .weather-icon {
+        width: 32px;
+        height: 32px;
+      }
+      
+      .weather-icon img {
+        width: 20px;
+        height: 20px;
+      }
+      
+      .temperature-cell {
+        font-size: 16px;
+      }
+      
+      .wind-info {
+        font-size: 14px;
+      }
+      
+      .sidebar-icon {
+        width: 32px;
+        height: 32px;
+        font-size: 18px;
+      }
     }
   </style>
 </head>
 <body>
+  <!-- Sidebar Navigation -->
   <div class="sidebar">
     <div class="sidebar-content">
       <div class="sidebar-item">
-        <i class="fa-solid fa-house sidebar-icon" id="home-icon"></i>
+        <i class="fa-solid fa-house sidebar-icon" id="home-icon" title="ホーム"></i>
       </div>
       <div class="sidebar-item">
-        <i class="fa-solid fa-bullseye sidebar-icon" id="weather-map-icon"></i>
+        <i class="fa-solid fa-bullseye sidebar-icon" id="weather-map-icon" title="天気図"></i>
       </div>
       <div class="sidebar-item">
-        <i class="fa-regular fa-clock sidebar-icon" id="time-icon"></i>
+        <i class="fa-regular fa-clock sidebar-icon" id="time-icon" title="時間予報"></i>
       </div>
       <div class="sidebar-item">
-        <i class="fa-regular fa-calendar sidebar-icon"></i>
+        <i class="fa-regular fa-calendar sidebar-icon" id="calendar-icon" title="カレンダー"></i>
       </div>
       <div class="sidebar-item">
-        <i class="fa-solid fa-cloud sidebar-icon"></i>
+        <i class="fa-solid fa-cloud sidebar-icon" id="cloud-icon" title="警報"></i>
       </div>
       <div class="sidebar-item">
-        <i class="fa-solid fa-chart-line sidebar-icon"></i>
-      </div>
-      <div class="sidebar-item">
-        <i class="fa-regular fa-star sidebar-icon"></i>
-      </div>
-      <div class="sidebar-item">
-        <i class="fa-regular fa-face-smile sidebar-icon"></i>
+        <i class="fa-regular fa-face-smile sidebar-icon" id="smile-icon" title="ノート"></i>
       </div>
     </div>
   </div>
+
+  <!-- Main Content -->
   <div class="main-content">
     <div class="forecast-container">
-      <!-- Tabs ngày -->
-      <div class="forecast-tabs">
-        <button class="forecast-tab active"> 今日</button>
+      <!-- Header -->
+      <div class="forecast-header">
+        <div class="forecast-title">
+          <i class="fa-solid fa-clock"></i>
+          1時間ごとの天気予報
+        </div>
+        <div class="forecast-subtitle">24時間の詳細予報</div>
       </div>
-      <!-- Bảng dự báo thời tiết -->
+
+      <!-- Tabs -->
+      <div class="forecast-tabs">
+        <button class="forecast-tab active">
+          <i class="fa-solid fa-calendar-day"></i>
+          今日
+        </button>
+      </div>
+
+      <!-- Forecast Table -->
       <table class="forecast-table">
         <thead>
           <tr>
@@ -204,83 +440,189 @@
           </tr>
         </thead>
         <tbody id="forecast-body">
-          <!-- Dữ liệu sẽ được sinh tự động bằng JS -->
+          <tr>
+            <td colspan="4" class="loading-state">
+              <div class="loading-spinner"></div>
+              <div>天気予報を読み込み中...</div>
+            </td>
+          </tr>
         </tbody>
       </table>
     </div>
   </div>
+
   <script>
-    // Sidebar navigation
-    document.getElementById('home-icon').onclick = function() {
-      window.location.href = 'index.html';
-    };
-    document.getElementById('weather-map-icon').onclick = function() {
-      window.location.href = 'maps.html';
-    };
-    document.getElementById('time-icon').onclick = function() {
-      window.location.href = 'time.html';
+    // Navigation Functions
+    const navigation = {
+      home: () => window.location.href = 'index.html',
+      weatherMap: () => window.location.href = 'maps.html',
+      time: () => window.location.href = 'time.html',
+      calendar: () => window.location.href = 'monthly forecast.html',
+      cloud: () => window.location.href = 'warning.html',
+      smile: () => window.location.href = 'note.html'
     };
 
-    // Lấy icon đúng với ảnh bạn có
+    // Event Listeners
+    document.addEventListener('DOMContentLoaded', function() {
+      // Sidebar navigation
+      document.getElementById('home-icon').addEventListener('click', navigation.home);
+      document.getElementById('weather-map-icon').addEventListener('click', navigation.weatherMap);
+      document.getElementById('time-icon').addEventListener('click', navigation.time);
+      document.getElementById('calendar-icon').addEventListener('click', navigation.calendar);
+      document.getElementById('cloud-icon').addEventListener('click', navigation.cloud);
+      document.getElementById('smile-icon').addEventListener('click', navigation.smile);
+    });
+
+    // Weather icon mapping
     function getWeatherIcon(code) {
-      if (code === 0) return "images/clear.png"; // Trời nắng
-      if ([1,2,3].includes(code)) return "images/clouds.png"; // Nhiều mây
-      if ([45,48].includes(code)) return "images/fog.png"; // Sương mù
-      if ([51,53,55,56,57,61,63,65,66,67,80,81,82].includes(code)) return "images/rain.png"; // Mưa
-      if ([71,73,75,77,85,86].includes(code)) return "images/snow.png"; // Tuyết
-      if ([95,96,99].includes(code)) return "images/thunder.png"; // Dông
-      return "images/clouds.png";
-    }
-    function getWeatherText(code) {
-      if (code === 0) return "晴れ";
-      if ([1,2,3].includes(code)) return "曇り";
-      if ([45,48].includes(code)) return "霧";
-      if ([51,53,55,56,57,61,63,65,66,67,80,81,82].includes(code)) return "雨";
-      if ([71,73,75,77,85,86].includes(code)) return "雪";
-      if ([95,96,99].includes(code)) return "雷雨";
-      return "曇り";
+      const iconMap = {
+        0: "☀️", // Clear sky
+        1: "🌤️", // Mainly clear
+        2: "⛅", // Partly cloudy
+        3: "☁️", // Overcast
+        45: "🌫️", // Fog
+        48: "🌫️", // Depositing rime fog
+        51: "🌦️", // Light drizzle
+        53: "🌦️", // Moderate drizzle
+        55: "🌧️", // Dense drizzle
+        56: "🌧️", // Light freezing drizzle
+        57: "🌧️", // Dense freezing drizzle
+        61: "🌧️", // Slight rain
+        63: "🌧️", // Moderate rain
+        65: "🌧️", // Heavy rain
+        66: "🌧️", // Light freezing rain
+        67: "🌧️", // Heavy freezing rain
+        71: "❄️", // Slight snow fall
+        73: "❄️", // Moderate snow fall
+        75: "❄️", // Heavy snow fall
+        77: "❄️", // Snow grains
+        80: "🌦️", // Slight rain showers
+        81: "🌧️", // Moderate rain showers
+        82: "🌧️", // Violent rain showers
+        85: "🌨️", // Slight snow showers
+        86: "🌨️", // Heavy snow showers
+        95: "⛈️", // Thunderstorm
+        96: "⛈️", // Thunderstorm with slight hail
+        99: "⛈️"  // Thunderstorm with heavy hail
+      };
+      return iconMap[code] || "☁️";
     }
 
-    // Lấy vị trí và gọi API Open-Meteo
-    if (navigator.geolocation) {
-      navigator.geolocation.getCurrentPosition(function(pos) {
-        const lat = pos.coords.latitude;
-        const lon = pos.coords.longitude;
-        fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&hourly=temperature_2m,windspeed_10m,weathercode&timezone=auto`)
-          .then(res => res.json())
-          .then(data => {
-            const now = new Date();
-            const hour = now.getHours();
-            const tbody = document.getElementById('forecast-body');
-            tbody.innerHTML = "";
-            for (let i = 0; i < 24; i++) {
-              const idx = hour + i;
-              const h = (hour + i) % 24;
-              const temp = data.hourly.temperature_2m[idx];
-              const wind = data.hourly.windspeed_10m[idx];
-              const code = data.hourly.weathercode[idx];
-              const icon = getWeatherIcon(code);
-              const text = getWeatherText(code);
-              const tr = document.createElement('tr');
-              tr.innerHTML = `
-                <td>${h.toString().padStart(2, '0')}:00</td>
-                <td><img src="${icon}" width="40" height="40"> ${text}</td>
-                <td>${Math.round(temp)}°C</td>
-                <td class="wind-info"><i class="fa-solid fa-wind"></i> ${wind} m/s</td>
-              `;
-              tbody.appendChild(tr);
-            }
-          });
-      }, function() {
-        document.getElementById('forecast-body').innerHTML = '<tr><td colspan="4">Không lấy được vị trí của bạn.</td></tr>';
-      });
-    } else {
-      document.getElementById('forecast-body').innerHTML = '<tr><td colspan="4">Trình duyệt không hỗ trợ định vị.</td></tr>';
+    function getWeatherText(code) {
+      const textMap = {
+        0: "晴れ",
+        1: "晴れ時々曇り",
+        2: "曇り時々晴れ",
+        3: "曇り",
+        45: "霧",
+        48: "霧",
+        51: "小雨",
+        53: "雨",
+        55: "強い雨",
+        56: "みぞれ",
+        57: "みぞれ",
+        61: "小雨",
+        63: "雨",
+        65: "大雨",
+        66: "みぞれ",
+        67: "みぞれ",
+        71: "小雪",
+        73: "雪",
+        75: "大雪",
+        77: "雪",
+        80: "にわか雨",
+        81: "雨",
+        82: "大雨",
+        85: "にわか雪",
+        86: "雪",
+        95: "雷雨",
+        96: "雷雨",
+        99: "雷雨"
+      };
+      return textMap[code] || "曇り";
     }
+
+    // Fetch weather data
+    function loadWeatherData() {
+      if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(
+          function(position) {
+            const lat = position.coords.latitude;
+            const lon = position.coords.longitude;
+            
+            fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&hourly=temperature_2m,windspeed_10m,weathercode&timezone=auto`)
+              .then(response => response.json())
+              .then(data => {
+                displayWeatherData(data);
+              })
+              .catch(error => {
+                console.error('Error fetching weather data:', error);
+                showError('天気データの取得に失敗しました。');
+              });
+          },
+          function(error) {
+            console.error('Geolocation error:', error);
+            showError('位置情報の取得に失敗しました。');
+          }
+        );
+      } else {
+        showError('このブラウザは位置情報をサポートしていません。');
+      }
+    }
+
+    function displayWeatherData(data) {
+      const now = new Date();
+      const currentHour = now.getHours();
+      const tbody = document.getElementById('forecast-body');
+      tbody.innerHTML = '';
+
+      for (let i = 0; i < 24; i++) {
+        const hourIndex = currentHour + i;
+        const displayHour = (currentHour + i) % 24;
+        const temp = data.hourly.temperature_2m[hourIndex];
+        const windSpeed = data.hourly.windspeed_10m[hourIndex];
+        const weatherCode = data.hourly.weathercode[hourIndex];
+        
+        const icon = getWeatherIcon(weatherCode);
+        const weatherText = getWeatherText(weatherCode);
+        
+        const row = document.createElement('tr');
+        row.innerHTML = `
+          <td class="time-cell">${displayHour.toString().padStart(2, '0')}:00</td>
+          <td>
+            <div class="weather-cell">
+              <div class="weather-icon">
+                <span style="font-size: 24px;">${icon}</span>
+              </div>
+              <span>${weatherText}</span>
+            </div>
+          </td>
+          <td class="temperature-cell">${Math.round(temp)}°C</td>
+          <td>
+            <div class="wind-info">
+              <i class="fa-solid fa-wind"></i>
+              <span>${windSpeed} m/s</span>
+            </div>
+          </td>
+        `;
+        tbody.appendChild(row);
+      }
+    }
+
+    function showError(message) {
+      const tbody = document.getElementById('forecast-body');
+      tbody.innerHTML = `
+        <tr>
+          <td colspan="4" class="error-state">
+            <i class="fa-solid fa-exclamation-triangle"></i>
+            <div>${message}</div>
+          </td>
+        </tr>
+      `;
+    }
+
+    // Initialize
+    loadWeatherData();
   </script>
 </body>
 </html>
-
-
-
-

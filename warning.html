@@ -1,0 +1,565 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>生活 - 天気情報</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-annotation@4.1.1/dist/chartjs-plugin-annotation.min.js"></script>
+  <style>
+    body {
+      background: linear-gradient(120deg, #f8fafc 0%, #e0f2fe 100%);
+      min-height: 100vh;
+    }
+    .sidebar { box-shadow: 2px 0 12px rgba(0,0,0,0.1); }
+    .scrollbar-hide::-webkit-scrollbar { display: none; }
+    .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
+    .dot { 
+      width: 0.75rem; 
+      height: 0.75rem; 
+      border-radius: 9999px; 
+      display: inline-block; 
+      margin-left: 0.5rem; 
+    }
+    .dot-good { background: #22c55e; }
+    .dot-warn { background: #facc15; }
+    .dot-bad { background: #ef4444; }
+    .dot-gray { background: #64748b; }
+    .card { 
+      background: rgba(255,255,255,0.95); 
+      box-shadow: 0 4px 24px rgba(0,0,0,0.08); 
+      border: 1px solid rgba(255,255,255,0.2);
+    }
+    .chart-bg { 
+      background: linear-gradient(135deg, #e0f2fe 0%, #bae6fd 100%); 
+      border-radius: 1rem; 
+    }
+    .alert-box { 
+      background: #ef4444; 
+      color: #fff; 
+      border-radius: 0.5rem; 
+      padding: 0.75rem 1rem; 
+      font-weight: 600; 
+      margin-bottom: 1rem; 
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1); 
+    }
+    .bg-weather {
+      position: fixed;
+      right: 2rem; 
+      bottom: 2rem;
+      width: 300px; 
+      height: 300px;
+      opacity: 0.08;
+      z-index: 0;
+      pointer-events: none;
+      background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M17.5 19H9a7 7 0 1 1 6.71-9h1.79a4.5 4.5 0 1 1 0 9Z"/></svg>') no-repeat center;
+      background-size: contain;
+      color: #3b82f6;
+    }
+    
+    /* Fixed Layout Styles */
+    .main-container {
+      display: flex;
+      max-width: 1400px;
+      margin: 0 auto;
+      gap: 1.5rem;
+    }
+    
+    .left-panel {
+      width: 380px;
+      flex-shrink: 0;
+    }
+    
+    .right-panel {
+      flex: 1;
+      min-width: 0;
+    }
+    
+    /* Responsive Design */
+    @media (max-width: 1024px) {
+      .main-container {
+        flex-direction: column;
+      }
+      .left-panel {
+        width: 100%;
+      }
+      .bg-weather {
+        width: 200px;
+        height: 200px;
+      }
+    }
+    
+    @media (max-width: 768px) {
+      .bg-weather {
+        display: none;
+      }
+      .main-container {
+        gap: 1rem;
+      }
+    }
+  </style>
+</head>
+<body class="min-h-screen flex flex-col">
+
+  <!-- Weather Background -->
+  <div class="bg-weather"></div>
+
+  <!-- Sidebar Navigation -->
+  <nav class="sidebar fixed left-0 top-0 bottom-0 w-16 flex flex-col items-center justify-center bg-slate-900/90 z-50">
+    <div class="flex flex-col gap-4 items-center py-6 w-full">
+      <button id="home-icon" class="p-2 hover:bg-blue-700 rounded text-white transition-colors">
+        <i class="fa-solid fa-house text-xl"></i>
+      </button>
+      <button id="weather-map-icon" class="p-2 hover:bg-blue-700 rounded text-white transition-colors">
+        <i class="fa-solid fa-map-location-dot text-xl"></i>
+      </button>
+      <button id="time-icon" class="p-2 hover:bg-blue-700 rounded text-white transition-colors">
+        <i class="fa-regular fa-clock text-xl"></i>
+      </button>
+      <button id="calendar-icon" class="p-2 hover:bg-blue-700 rounded text-white transition-colors">
+        <i class="fa-regular fa-calendar text-xl"></i>
+      </button>
+      <button id="cloud-icon" class="p-2 hover:bg-blue-700 rounded text-white transition-colors">
+        <i class="fa-solid fa-cloud text-xl"></i>
+      </button>
+      <button id="smile-icon" class="p-2 bg-blue-600 rounded shadow text-cyan-300">
+        <i class="fa-regular fa-face-smile text-xl"></i>
+      </button>
+    </div>
+  </nav>
+
+  <!-- Main Content Wrapper -->
+  <div class="flex-1 flex flex-col ml-16 relative z-10">
+    <!-- Header -->
+    <header class="flex items-center justify-between px-6 py-4 bg-white/90 shadow-sm backdrop-blur-sm">
+      <div class="flex items-center gap-3">
+        <span class="font-bold text-2xl text-blue-900">生活</span>
+        <span class="text-blue-700 text-sm">神奈川県, <span id="city-label">横浜市</span></span>
+      </div>
+      <div class="flex items-center gap-3">
+        <select id="city-select" class="bg-blue-50 text-blue-900 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400 font-semibold border border-blue-200">
+          <option value="yokohama">横浜市</option>
+          <option value="tokyo">東京</option>
+          <option value="osaka">大阪</option>
+          <option value="nagoya">名古屋</option>
+          <option value="sapporo">札幌</option>
+        </select>
+        <button class="p-2 rounded-lg bg-blue-600 text-white hover:bg-blue-700 transition-colors">
+          <i class="fa-solid fa-sync-alt"></i>
+        </button>
+      </div>
+    </header>
+
+    <!-- Main Content with Fixed Layout -->
+    <main class="flex-1 p-6">
+      <div class="main-container">
+        <!-- Left Panel -->
+        <aside class="left-panel flex flex-col gap-6">
+          <!-- Date Navigation -->
+          <div class="flex gap-2 overflow-x-auto scrollbar-hide pb-2">
+            <button class="bg-blue-600 text-white rounded-lg px-4 py-2 font-semibold shadow hover:bg-blue-700 whitespace-nowrap transition-colors">
+              今日 34° 26°
+            </button>
+            <button class="bg-blue-400 text-white rounded-lg px-4 py-2 font-semibold shadow hover:bg-blue-500 whitespace-nowrap transition-colors">
+              8日(火)
+            </button>
+            <button class="bg-blue-400 text-white rounded-lg px-4 py-2 font-semibold shadow hover:bg-blue-500 whitespace-nowrap transition-colors">
+              9日(水)
+            </button>
+            <button class="bg-blue-400 text-white rounded-lg px-4 py-2 font-semibold shadow hover:bg-blue-500 whitespace-nowrap transition-colors">
+              10日(木)
+            </button>
+          </div>
+
+          <!-- Life Index Card -->
+          <div class="card rounded-2xl p-6 shadow-lg">
+            <div class="flex gap-4 border-b border-blue-200 pb-3 mb-4">
+              <span class="font-semibold text-blue-900 border-b-2 border-blue-600 pb-1 cursor-pointer">
+                健康と安全
+              </span>
+              <span class="cursor-pointer text-blue-400 hover:text-blue-600 transition-colors">
+                アクティビティ
+              </span>
+            </div>
+            <div class="flex flex-col gap-4">
+              <div class="flex items-center justify-between py-2">
+                <span class="flex items-center gap-2">
+                  <i class="fa-solid fa-umbrella text-blue-500"></i> 
+                  傘
+                </span>
+                <span id="need-umbrella" class="font-medium text-sm">必要なし</span>
+                <span id="umbrella-dot" class="dot dot-good"></span>
+              </div>
+              <div class="flex items-center justify-between py-2">
+                <span class="flex items-center gap-2">
+                  <i class="fa-solid fa-person-walking text-green-500"></i> 
+                  アウトドア
+                </span>
+                <span id="outdoor-status" class="font-medium text-sm">非常に悪い</span>
+                <span id="outdoor-dot" class="dot dot-bad"></span>
+              </div>
+              <div class="flex items-center justify-between py-2">
+                <span class="flex items-center gap-2">
+                  <i class="fa-solid fa-sun text-yellow-500"></i> 
+                  UV指数
+                </span>
+                <span id="uv-index" class="font-medium text-sm">強い</span>
+                <span id="uv-dot" class="dot dot-warn"></span>
+              </div>
+              <div class="flex items-center justify-between py-2">
+                <span class="flex items-center gap-2">
+                  <i class="fa-solid fa-car text-blue-500"></i> 
+                  運転の安全性
+                </span>
+                <span id="driving-safety" class="font-medium text-sm">非常に悪い</span>
+                <span id="driving-dot" class="dot dot-bad"></span>
+              </div>
+              <div class="flex items-center justify-between py-2">
+                <span class="flex items-center gap-2">
+                  <i class="fa-solid fa-shirt text-purple-500"></i> 
+                  洋服
+                </span>
+                <span id="clothing" class="font-medium text-sm">ショートパンツ</span>
+                <span class="dot dot-gray opacity-0"></span>
+              </div>
+              <div class="flex items-center justify-between py-2">
+                <span class="flex items-center gap-2">
+                  <i class="fa-solid fa-temperature-high text-red-500"></i> 
+                  熱中症
+                </span>
+                <span id="heatstroke" class="font-medium text-sm">危険</span>
+                <span id="heatstroke-dot" class="dot dot-bad"></span>
+              </div>
+            </div>
+          </div>
+        </aside>
+
+        <!-- Right Panel -->
+        <section class="right-panel flex flex-col gap-6">
+          <!-- Alert Box -->
+          <div id="alert-box" class="alert-box">
+            ⚠️ 熱中症の危険があります。水分補給・休憩を心がけてください。<br>
+            ⚠️ UV指数が高いです。日焼け止めや帽子を使いましょう。
+          </div>
+
+          <!-- Main Detail Card -->
+          <div class="card rounded-2xl p-6 shadow-lg flex flex-col gap-6">
+            <div class="flex items-center gap-3 mb-2">
+              <i class="fa-solid fa-umbrella text-blue-500 text-xl"></i>
+              <span class="font-semibold text-xl text-blue-900">傘</span>
+              <span id="umbrella-detail-status" class="ml-2 text-lg text-blue-700 font-medium">必要なし</span>
+            </div>
+            <div id="umbrella-detail-desc" class="text-blue-700 mb-4 p-3 bg-blue-50 rounded-lg">
+              午前は晴れており、傘は必要ありません。午後も雨の予報はありません。
+            </div>
+            
+            <!-- Umbrella Necessity Chart -->
+            <div class="chart-bg p-4 mb-4">
+              <h3 class="text-sm font-semibold text-blue-900 mb-3">傘の必要性 (24時間)</h3>
+              <div class="h-32">
+                <canvas id="warningChart"></canvas>
+              </div>
+            </div>
+            
+            <!-- Temperature Chart -->
+            <div class="chart-bg p-4">
+              <h3 class="text-sm font-semibold text-blue-900 mb-3">気温 (24時間)</h3>
+              <div class="h-24">
+                <canvas id="tempChart"></canvas>
+              </div>
+            </div>
+          </div>
+        </section>
+      </div>
+    </main>
+  </div>
+
+  <script>
+    // Status dot management
+    function setDot(dotId, status) {
+      const dot = document.getElementById(dotId);
+      if (!dot) return;
+      dot.className = "dot";
+      if (status === "good") dot.classList.add("dot-good");
+      else if (status === "warn") dot.classList.add("dot-warn");
+      else if (status === "bad") dot.classList.add("dot-bad");
+      else dot.classList.add("dot-gray");
+    }
+
+    // Safe element update
+    function updateElement(id, value) {
+      const element = document.getElementById(id);
+      if (element) element.textContent = value;
+    }
+
+    // UI update function
+    function updateUI(data) {
+      if (!data) return;
+      
+      updateElement("city-label", data.cityLabel);
+      updateElement("need-umbrella", data.umbrella.text);
+      updateElement("outdoor-status", data.outdoor.text);
+      updateElement("uv-index", data.uv.text);
+      updateElement("driving-safety", data.driving.text);
+      updateElement("clothing", data.clothing);
+      updateElement("heatstroke", data.heatstroke.text);
+      updateElement("umbrella-detail-status", data.umbrella.text);
+      updateElement("umbrella-detail-desc", data.umbrella.desc);
+
+      // Update status dots
+      setDot("umbrella-dot", data.umbrella.dot);
+      setDot("outdoor-dot", data.outdoor.dot);
+      setDot("uv-dot", data.uv.dot);
+      setDot("driving-dot", data.driving.dot);
+      setDot("heatstroke-dot", data.heatstroke.dot);
+
+      // Update alerts
+      const alertBox = document.getElementById("alert-box");
+      let alertMsg = "";
+      if (data.heatstroke.dot === "bad") alertMsg += "⚠️ 熱中症の危険があります。水分補給・休憩を心がけてください。<br>";
+      if (data.uv.dot === "warn" || data.uv.dot === "bad") alertMsg += "⚠️ UV指数が高いです。日焼け止めや帽子を使いましょう。<br>";
+      if (data.umbrella.dot === "bad") alertMsg += "⚠️ 雨が強いです。傘を忘れずに！<br>";
+      if (alertBox) {
+        alertBox.innerHTML = alertMsg;
+        alertBox.style.display = alertMsg ? "block" : "none";
+      }
+
+      // Update charts
+      drawUmbrellaChart(data.umbrellaChart || [4,4,4,4,4,4,4,4,4,4,4,4,4]);
+      drawTemperatureChart(data.tempHours || [], data.tempValues || []);
+    }
+
+    // City data
+    const cityData = {
+      yokohama: {
+        cityLabel: "横浜市",
+        umbrella: { text: "必要なし", dot: "good", desc: "午前は晴れており、傘は必要ありません。午後も雨の予報はありません。" },
+        outdoor: { text: "非常に悪い", dot: "bad" },
+        uv: { text: "強い", dot: "warn" },
+        driving: { text: "非常に悪い", dot: "bad" },
+        clothing: "ショートパンツ",
+        heatstroke: { text: "危険", dot: "bad" },
+        tempHours: ["11:00","13:00","15:00","17:00","19:00","21:00","23:00","01:00","03:00","05:00","07:00","09:00"],
+        tempValues: [34,35,35,33,31,30,29,28,28,29,30,32],
+        umbrellaChart: [4,4,4,4,4,4,4,4,4,4,4,4,4]
+      },
+      tokyo: {
+        cityLabel: "東京",
+        umbrella: { text: "必要", dot: "bad", desc: "午後は強い雨が予想されます。傘を持参することをお勧めします。" },
+        outdoor: { text: "悪い", dot: "warn" },
+        uv: { text: "非常に強い", dot: "bad" },
+        driving: { text: "悪い", dot: "warn" },
+        clothing: "Tシャツ",
+        heatstroke: { text: "注意", dot: "warn" },
+        tempHours: ["11:00","13:00","15:00","17:00","19:00","21:00","23:00","01:00","03:00","05:00","07:00","09:00"],
+        tempValues: [32,33,33,32,30,29,28,27,27,28,29,31],
+        umbrellaChart: [1,1,2,2,3,3,4,4,4,4,4,4,4]
+      },
+      osaka: {
+        cityLabel: "大阪",
+        umbrella: { text: "不要", dot: "good", desc: "一日中晴れの予報です。雨の心配はありません。" },
+        outdoor: { text: "良い", dot: "good" },
+        uv: { text: "中程度", dot: "warn" },
+        driving: { text: "良好", dot: "good" },
+        clothing: "Tシャツ + 長ズボン",
+        heatstroke: { text: "注意", dot: "warn" },
+        tempHours: ["11:00","13:00","15:00","17:00","19:00","21:00","23:00","01:00","03:00","05:00","07:00","09:00"],
+        tempValues: [31,32,32,31,29,28,27,26,26,27,28,30],
+        umbrellaChart: [4,4,4,4,4,4,4,4,4,4,4,4,4]
+      },
+      nagoya: {
+        cityLabel: "名古屋",
+        umbrella: { text: "必要性が高い", dot: "warn", desc: "夕方に小雨の可能性があります。念のため傘を持参してください。" },
+        outdoor: { text: "普通", dot: "warn" },
+        uv: { text: "強い", dot: "warn" },
+        driving: { text: "普通", dot: "warn" },
+        clothing: "Tシャツ",
+        heatstroke: { text: "注意", dot: "warn" },
+        tempHours: ["11:00","13:00","15:00","17:00","19:00","21:00","23:00","01:00","03:00","05:00","07:00","09:00"],
+        tempValues: [30,31,31,30,28,27,26,25,25,26,27,29],
+        umbrellaChart: [3,3,3,2,2,3,4,4,4,4,4,4,4]
+      },
+      sapporo: {
+        cityLabel: "札幌",
+        umbrella: { text: "不要", dot: "good", desc: "晴れの一日です。傘の心配はありません。" },
+        outdoor: { text: "良い", dot: "good" },
+        uv: { text: "弱い", dot: "good" },
+        driving: { text: "良好", dot: "good" },
+        clothing: "ジャケット",
+        heatstroke: { text: "安全", dot: "good" },
+        tempHours: ["11:00","13:00","15:00","17:00","19:00","21:00","23:00","01:00","03:00","05:00","07:00","09:00"],
+        tempValues: [22,23,23,22,21,20,19,18,18,19,20,21],
+        umbrellaChart: [4,4,4,4,4,4,4,4,4,4,4,4,4]
+      }
+    };
+
+    // Chart variables
+    let warningChart = null;
+    let tempChart = null;
+
+    // Draw umbrella chart
+    function drawUmbrellaChart(umbrellaLevels) {
+      const ctx = document.getElementById('warningChart');
+      if (!ctx) return;
+      
+      if (warningChart) {
+        warningChart.destroy();
+      }
+
+      const hours = ["11:00","13:00","15:00","17:00","19:00","21:00","23:00","01:00","03:00","05:00","07:00","09:00"];
+      
+      warningChart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+          labels: hours,
+          datasets: [{
+            label: '傘レベル',
+            data: umbrellaLevels,
+            backgroundColor: 'rgba(59, 130, 246, 0.8)',
+            borderColor: 'rgba(59, 130, 246, 1)',
+            borderWidth: 1,
+            borderRadius: 4,
+            barPercentage: 0.6,
+            categoryPercentage: 0.8
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: { display: false }
+          },
+          scales: {
+            y: {
+              min: 0,
+              max: 4,
+              reverse: true,
+              ticks: {
+                stepSize: 1,
+                callback: function(value) {
+                  const labels = ["必須", "必要", "必要性が高い", "おそらく必要ない", "必要なし"];
+                  return labels[value] || "";
+                },
+                color: "#374151",
+                font: { size: 11 }
+              },
+              grid: { 
+                color: "rgba(107, 114, 128, 0.2)",
+                drawBorder: false
+              }
+            },
+            x: {
+              ticks: { 
+                color: "#374151", 
+                font: { size: 10 }
+              },
+              grid: { 
+                display: false
+              }
+            }
+          }
+        }
+      });
+    }
+
+    // Draw temperature chart
+    function drawTemperatureChart(hours, temps) {
+      const ctx = document.getElementById('tempChart');
+      if (!ctx) return;
+      
+      if (tempChart) {
+        tempChart.destroy();
+      }
+
+      tempChart = new Chart(ctx, {
+        type: 'line',
+        data: {
+          labels: hours,
+          datasets: [{
+            label: '気温',
+            data: temps,
+            borderColor: 'rgba(239, 68, 68, 1)',
+            backgroundColor: 'rgba(239, 68, 68, 0.1)',
+            borderWidth: 2,
+            fill: true,
+            tension: 0.4,
+            pointBackgroundColor: 'rgba(239, 68, 68, 1)',
+            pointBorderColor: '#fff',
+            pointBorderWidth: 2,
+            pointRadius: 3
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: { display: false }
+          },
+          scales: {
+            y: {
+              ticks: {
+                callback: function(value) {
+                  return value + '°C';
+                },
+                color: "#374151",
+                font: { size: 11 }
+              },
+              grid: { 
+                color: "rgba(107, 114, 128, 0.2)",
+                drawBorder: false
+              }
+            },
+            x: {
+              ticks: { 
+                color: "#374151", 
+                font: { size: 10 }
+              },
+              grid: { 
+                display: false
+              }
+            }
+          }
+        }
+      });
+    }
+
+    // Sidebar navigation
+    document.addEventListener("DOMContentLoaded", function() {
+      // Initialize with Yokohama data
+      updateUI(cityData.yokohama);
+      
+      // City selector change handler
+      document.getElementById("city-select").addEventListener("change", function() {
+        const selectedCity = this.value;
+        if (cityData[selectedCity]) {
+          updateUI(cityData[selectedCity]);
+        }
+      });
+
+      // Sidebar navigation event listeners
+      document.getElementById('home-icon').onclick = function() {
+        window.location.href = 'index.html';
+      };
+      
+      document.getElementById('weather-map-icon').onclick = function() {
+        window.location.href = 'maps.html';
+      };
+      
+      document.getElementById('time-icon').onclick = function() {
+        window.location.href = 'time.html';
+      };
+      
+      document.getElementById('calendar-icon').onclick = function() {
+        window.location.href = 'monthly-forecast.html';
+      };
+      
+      document.getElementById('cloud-icon').onclick = function() {
+        window.location.href = 'warning.html';
+      };
+
+    });
+  </script>
+</body>
+</html>

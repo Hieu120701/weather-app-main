@@ -1,186 +1,130 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ja">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Weather App</title>
-    <link rel="stylesheet" href="style.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
-    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script>
-      function timeToHour(timeStr) {
-        if (!timeStr || timeStr === '--:--') return 0;
-        const [h, m] = timeStr.split(":").map(Number);
-        return h + m / 60;
-      }
-      function hourToTimeLabel(hour) {
-        const h = Math.floor(hour);
-        const m = Math.round((hour - h) * 60);
-        return `${h}:${m.toString().padStart(2, '0')}`;
-      }
-      function drawSunChart() {
-        const sunrise = document.getElementById('sunrise').textContent.trim();
-        const sunset = document.getElementById('sunset').textContent.trim();
-        if (window.sunChartInstance) window.sunChartInstance.destroy();
-        const ctx = document.getElementById('sunChart').getContext('2d');
-        const dataArr = [timeToHour(sunrise), timeToHour(sunset)];
-        window.sunChartInstance = new Chart(ctx, {
-          type: 'bar',
-          data: {
-            labels: ['日の出', '日の入り'],
-            datasets: [{
-              label: '時刻',
-              data: dataArr,
-              backgroundColor: ['#FFD700', '#FF8C00']
-            }]
-          },
-          options: {
-            plugins: {
-              tooltip: {
-                callbacks: {
-                  label: function(context) {
-                    return hourToTimeLabel(context.parsed.y);
-                  }
-                }
-              }
-            },
-            scales: {
-              y: {
-                beginAtZero: true,
-                max: 24,
-                title: { display: true, text: '時' },
-                ticks: {
-                  callback: function(value) {
-                    return hourToTimeLabel(value);
-                  }
-                }
-              }
-            }
-          }
-        });
-      }
-      window.addEventListener('DOMContentLoaded', drawSunChart);
-    </script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Weather App</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Inter:wght@400;600;900&display=swap">
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+  <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
-<body id="body" style="display: flex; flex-direction: row; min-height: 100vh;">
-
+<body>
   <!-- Sidebar -->
-  <div class="sidebar">
-    <div class="sidebar-content">
-      <div class="sidebar-item">
+  <aside class="sidebar" aria-label="Main navigation">
+    <nav class="sidebar-content">
+      <button class="sidebar-item active" title="Trang chủ">
         <i class="fa-solid fa-house sidebar-icon" id="home-icon"></i>
-      </div>
-      <div class="sidebar-item">
+      </button>
+      <button class="sidebar-item" title="Bản đồ thời tiết">
         <i class="fa-solid fa-bullseye sidebar-icon" id="weather-map-icon"></i>
-      </div>
-      <div class="sidebar-item">
+      </button>
+      <button class="sidebar-item" title="Thời gian">
         <i class="fa-regular fa-clock sidebar-icon" id="time-icon"></i>
-      </div>
-      <div class="sidebar-item">
-        <i class="fa-regular fa-calendar sidebar-icon"></i>
-      </div>
-      <div class="sidebar-item">
-        <i class="fa-solid fa-cloud sidebar-icon"></i>
-      </div>
-      <div class="sidebar-item">
-        <i class="fa-solid fa-chart-line sidebar-icon"></i>
-      </div>
-      <div class="sidebar-item">
-        <i class="fa-regular fa-star sidebar-icon"></i>
-      </div>
-      <div class="sidebar-item">
-        <i class="fa-regular fa-face-smile sidebar-icon"></i>
-      </div>
-    </div>
-  </div>
+      </button>
+      <button class="sidebar-item" title="Lịch tháng">
+        <i class="fa-regular fa-calendar sidebar-icon" id="calendar-icon"></i>
+      </button>
+      <button class="sidebar-item" title="Cảnh báo thời tiết">
+        <i class="fa-solid fa-cloud sidebar-icon" id="cloud-icon"></i>
+      </button>
+      <button class="sidebar-item" title="Ghi chú">
+        <i class="fa-regular fa-face-smile sidebar-icon" id="smile-icon"></i>
+      </button>
+    </nav>
+  </aside>
 
   <!-- Main Content -->
-  <div class="main-content flex-1 max-w-7xl mx-auto px-4 py-6" style="flex:1 1 0%; min-width:0;">
-    <!-- Thanh tìm kiếm -->
-    <div class="search" style="margin-bottom: 24px;">
-      <input id="search-input" type="text" placeholder="Nhập tên thành phố..." />
-      <button id="search-btn"><img src="images/search.png" alt="Tìm kiếm" /></button>
-      <button id="toggle-mode" title="Chuyển chế độ sáng/tối" style="margin-left:12px;">🌓</button>
-    </div>
+  <main class="main-content">
+    <!-- Search Bar -->
+    <form class="search" autocomplete="off" onsubmit="event.preventDefault();">
+      <input id="search-input" type="text" placeholder="Nhập tên thành phố..." aria-label="Nhập tên thành phố" />
+      <button id="search-btn" type="button" aria-label="Tìm kiếm">
+        <i class="fa-solid fa-magnifying-glass"></i>
+      </button>
+      <button id="toggle-mode" type="button" title="Chuyển chế độ sáng/tối" aria-label="Chuyển chế độ sáng/tối">
+        <i class="fa-regular fa-moon"></i>
+      </button>
+    </form>
 
-    <!-- 3 card ngang -->
-    <div class="main-cards-row grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
-      <!-- Card: Thời weather hiện tại -->
-      <div id="current-weather" class="main-card flex flex-col items-center justify-center">
-        <div>
-          <h1 class="text-2xl font-bold city" id="location-name">都市名</h1>
+    <!-- Cards Row -->
+    <section class="main-cards-row">
+      <!-- Current Weather Card -->
+      <section id="current-weather" class="main-card glass" aria-label="Thời tiết hiện tại">
+        <div class="weather-card-header">
+          <h1 class="city" id="location-name">都市名</h1>
           <p class="text-sm" id="weather-time">時刻</p>
         </div>
-        <img src="images/clouds.png" class="weather-icon-small" id="weather-img" alt="天気アイコン">
-        <div class="text-3xl font-bold temp mt-2" id="temperature">--℃</div>
-        <div class="text-sm" id="description">天気説明</div>
-        <div class="details flex justify-center gap-8 mt-4">
-          <div class="col flex items-center space-x-2">
+        <img src="images/clouds.png" class="weather-icon-big" id="weather-img" alt="天気アイコン">
+        <div class="temp-display" id="temperature">--℃</div>
+        <div class="desc-display" id="description">天気説明</div>
+        <div class="details">
+          <div class="col">
             <img src="images/humidity.png" class="icon-small" alt="湿度">
             <div>
-              <p class="humidity font-bold" id="humidity">--%</p>
-              <p>湿度</p>
+              <span class="humidity" id="humidity">--%</span>
+              <div class="detail-label">湿度</div>
             </div>
           </div>
-          <div class="col flex items-center space-x-2">
+          <div class="col">
             <img src="images/wind.png" class="icon-small" alt="風速">
             <div>
-              <p class="wind font-bold" id="wind">--km/h</p>
-              <p>風速</p>
+              <span class="wind" id="wind">--km/h</span>
+              <div class="detail-label">風速</div>
             </div>
           </div>
         </div>
-      </div>
-      <!-- Card: Bản đồ Windy -->
-      <div class="main-card flex flex-col items-center justify-center">
-        <div class="text-xs text-center mt-2 flex flex-col items-center gap-2" style="width: 100%;">
-          <span>現在地で検索</span>
-          <button id="locate-btn" class="locate-btn flex items-center gap-1 mt-1">
-            <img src="images/location.png" alt="Định vị" style="width:28px;height:28px;">
+      </section>
+      <!-- Windy Map Card -->
+      <section class="main-card glass" aria-label="Bản đồ gió">
+        <div class="card-block">
+          <span class="card-block-title">現在地で検索</span>
+          <button id="locate-btn" class="locate-btn" aria-label="Định vị">
+            <i class="fa-solid fa-location-crosshairs"></i>
           </button>
-          <a href="https://www.windy.com/?35.6895,139.6917,5" target="_blank" title="Xem thời tiết động trên Windy"
-             style="display:block;border-radius:18px;overflow:hidden;margin-top:16px;width:100%;">
+          <a href="https://www.windy.com/?35.6895,139.6917,5" target="_blank" title="Xem thời tiết động trên Windy" class="windy-link">
             <iframe
               width="100%"
-              height="340"
+              height="210"
               src="https://embed.windy.com/embed2.html?lat=36.2048&lon=138.2529&detailLat=36.2048&detailLon=138.2529&width=600&height=260&zoom=5&level=surface&overlay=wind&product=ecmwf&menu=&message=true&marker=&calendar=now&pressure=&type=map&location=coordinates&detail=&metricWind=default&metricTemp=default&radarRange=-1"
               frameborder="0"
-              style="border:0; border-radius:18px; display:block; width:100%; min-width:240px; max-width:100%;"
-              allowfullscreen>
+              style="border:0; border-radius:18px; display:block; width:100%; min-width:180px; max-width:100%; margin-top:16px;"
+              allowfullscreen
+              aria-label="Bản đồ Windy">
             </iframe>
           </a>
         </div>
-      </div>
-      <!-- Card: Biểu đồ mặt trời -->
-      <div class="main-card flex flex-col items-center justify-center" id="sun-info">
-        <div class="sun-info text-center mt-4">
+      </section>
+      <!-- Sun Chart Card -->
+      <section class="main-card glass" id="sun-info" aria-label="Thông tin mặt trời">
+        <div class="sun-info">
           <div>
-            <img src="images/sunrise.png" width="32" style="display:inline"> 日の出: <span class="font-bold" id="sunrise">--:--</span>
+            <img src="images/sunrise.png" class="icon-sunrise" alt="日の出"> <span>日の出:</span> <span class="font-bold" id="sunrise">--:--</span>
           </div>
           <div>
-            <img src="images/sunset.png" width="32" style="display:inline"> 日の入り: <span class="font-bold" id="sunset">--:--</span>
+            <img src="images/sunset.png" class="icon-sunset" alt="日の入り"> <span>日の入り:</span> <span class="font-bold" id="sunset">--:--</span>
           </div>
           <div>
-            <img src="images/clock.png" width="32" style="display:inline"> 長さ: <span class="font-bold" id="day-length">--時間</span>
+            <img src="images/clock.png" class="icon-clock" alt="長さ"> <span>長さ:</span> <span class="font-bold" id="day-length">--時間</span>
           </div>
-          <canvas id="sunChart" width="350" height="180" style="margin-top:16px"></canvas>
+          <canvas id="sunChart" width="340" height="130"></canvas>
         </div>
-      </div>
-    </div>
+      </section>
+    </section>
 
     <!-- Error Message -->
-    <div id="error-message" class="mb-4 text-red-500 font-bold text-center"></div>
+    <div id="error-message" class="mb-4" role="alert"></div>
 
-    <!-- Thông báo sáng/tối dạng 2 khung tròn -->
-    <div id="weather-notice" style="display:flex;justify-content:center;gap:32px;margin:16px 0;"></div>
+    <!-- Notice Section -->
+    <div id="weather-notice" aria-live="polite"></div>
 
-     <!-- Dự báo theo giờ -->
-    <div class="hourly-section mt-2">
-      <div class="w-full max-w-3xl mx-auto">
-        <h2 class="text-xl font-bold mb-2 text-center">1時間ごとの予報</h2>
-        <div class="tab-menu">
+    <!-- Hourly Forecast -->
+    <section class="hourly-section mt-2">
+      <header>
+        <h2 class="section-title">1時間ごとの予報</h2>
+        <nav class="tab-menu" aria-label="Dự báo theo giờ">
           <button class="tab-btn active" data-type="rain">降水量</button>
           <button class="tab-btn" data-type="wind">風</button>
           <button class="tab-btn" data-type="humidity">湿度</button>
@@ -188,100 +132,156 @@
           <button class="tab-btn" data-type="pressure">気圧</button>
           <button class="tab-btn" data-type="visibility">視界</button>
           <button class="tab-btn" data-type="feelslike">体感温度</button>
-        </div>
-        <div id="hourly-forecast">
-          <canvas id="hourlyChart" width="600" height="300"></canvas>
-        </div>
+        </nav>
+      </header>
+      <div id="hourly-forecast">
+        <canvas id="hourlyChart" width="600" height="230"></canvas>
       </div>
-      <div class="w-full max-w-3xl mx-auto mt-8">
-        <div id="daily-forecast" class="flex flex-wrap justify-center gap-4"></div>
+      <div style="margin-top: 32px;">
+        <div id="daily-forecast"></div>
       </div>
-    </div>
+    </section>
 
-    <!-- Lưới card thông tin thời weather -->
-    <div class="weather-detail-header">
-      <span class="weather-detail-title">天気の詳細情報</span>
-      <span class="weather-detail-time" id="weather-detail-time"></span>
-    </div>
-    <div class="weather-grid">
-      <div class="card">
-        <div class="card-title">気温</div>
-        <div class="card-main">
-          <div class="card-value" id="temp-value">--°</div>
+    <!-- Weather Detail Grid -->
+    <section>
+      <header class="weather-detail-header">
+        <span class="weather-detail-title">天気の詳細情報</span>
+        <span class="weather-detail-time" id="weather-detail-time"></span>
+      </header>
+      <div class="weather-grid">
+        <div class="card glass">
+          <div class="card-title">気温</div>
+          <div class="card-main">
+            <div class="card-value" id="temp-value">--°</div>
+          </div>
+          <div class="card-desc" id="temp-desc"></div>
+          <canvas id="temp-spark" width="120" height="32"></canvas>
         </div>
-        <div class="card-desc" id="temp-desc"></div>
-        <canvas id="temp-spark" width="120" height="32" style="margin-top:8px"></canvas>
-      </div>
-      <div class="card">
-        <div class="card-title">体感温度</div>
-        <div class="card-main">
-          <div class="card-value" id="feels-value">--°</div>
+        <div class="card glass">
+          <div class="card-title">体感温度</div>
+          <div class="card-main">
+            <div class="card-value" id="feels-value">--°</div>
+          </div>
+          <div class="card-desc" id="feels-desc"></div>
+          <canvas id="feels-spark" width="120" height="32"></canvas>
         </div>
-        <div class="card-desc" id="feels-desc"></div>
-        <canvas id="feels-spark" width="120" height="32" style="margin-top:8px"></canvas>
-      </div>
-      <div class="card">
-        <div class="card-title">雲量</div>
-        <div class="card-main">
-          <div class="card-value" id="clouds-value">--</div>
+        <div class="card glass">
+          <div class="card-title">雲量</div>
+          <div class="card-main">
+            <div class="card-value" id="clouds-value">--</div>
+          </div>
+          <div class="card-desc" id="clouds-desc"></div>
+          <canvas id="clouds-spark" width="120" height="32"></canvas>
         </div>
-        <div class="card-desc" id="clouds-desc"></div>
-        <canvas id="clouds-spark" width="120" height="32" style="margin-top:8px"></canvas>
-      </div>
-      <div class="card">
-        <div class="card-title">降水量</div>
-        <div class="card-main">
-          <div class="card-value" id="rain-value">--</div>
+        <div class="card glass">
+          <div class="card-title">降水量</div>
+          <div class="card-main">
+            <div class="card-value" id="rain-value">--</div>
+          </div>
+          <div class="card-desc" id="rain-desc"></div>
+          <canvas id="rain-spark" width="120" height="32"></canvas>
         </div>
-        <div class="card-desc" id="rain-desc"></div>
-        <canvas id="rain-spark" width="120" height="32" style="margin-top:8px"></canvas>
-      </div>
-      <div class="card">
-        <div class="card-title">風</div>
-        <div class="card-main">
-          <div class="card-value" id="wind-value">--</div>
-          <span class="wind-time-label" style="font-size:0.95rem;color:#cbd5e1;margin-left:8px;" id="wind-time"></span>
+        <div class="card glass">
+          <div class="card-title">風</div>
+          <div class="card-main">
+            <div class="card-value" id="wind-value">--</div>
+            <span class="wind-time-label" id="wind-time"></span>
+          </div>
+          <div class="card-desc" id="wind-desc"></div>
+          <canvas id="wind-spark" width="120" height="32"></canvas>
         </div>
-        <div class="card-desc" id="wind-desc"></div>
-        <canvas id="wind-spark" width="120" height="32" style="margin-top:8px"></canvas>
-      </div>
-      <div class="card">
-        <div class="card-title">湿度</div>
-        <div class="card-main">
-          <div class="card-value" id="humidity-value">--%</div>
+        <div class="card glass">
+          <div class="card-title">湿度</div>
+          <div class="card-main">
+            <div class="card-value" id="humidity-value">--%</div>
+          </div>
+          <div class="card-desc" id="humidity-desc"></div>
+          <canvas id="humidity-spark" width="120" height="32"></canvas>
         </div>
-        <div class="card-desc" id="humidity-desc"></div>
-        <canvas id="humidity-spark" width="120" height="32" style="margin-top:8px"></canvas>
-      </div>
-      <div class="card">
-        <div class="card-title">視界</div>
-        <div class="card-main">
-          <div class="card-value" id="visibility-value">--</div>
+        <div class="card glass">
+          <div class="card-title">視界</div>
+          <div class="card-main">
+            <div class="card-value" id="visibility-value">--</div>
+          </div>
+          <div class="card-desc" id="visibility-desc"></div>
+          <canvas id="visibility-spark" width="120" height="32"></canvas>
         </div>
-        <div class="card-desc" id="visibility-desc"></div>
-        <canvas id="visibility-spark" width="120" height="32" style="margin-top:8px"></canvas>
-      </div>
-      <div class="card">
-        <div class="card-title">気圧</div>
-        <div class="card-main">
-          <div class="card-value" id="pressure-value">--</div>
+        <div class="card glass">
+          <div class="card-title">気圧</div>
+          <div class="card-main">
+            <div class="card-value" id="pressure-value">--</div>
+          </div>
+          <div class="card-desc" id="pressure-desc"></div>
+          <canvas id="pressure-spark" width="120" height="32"></canvas>
         </div>
-        <div class="card-desc" id="pressure-desc"></div>
-        <canvas id="pressure-spark" width="120" height="32" style="margin-top:8px"></canvas>
       </div>
-    </div>
-
-    <p class="mt-8 text-center text-xs text-white/70">Made by VINMO.DEV</p>
-
+    </section>
+    <footer>
+      <p class="mt-8 text-center text-xs" style="opacity:.6">Made by VINMO.DEV</p>
+    </footer>
     <!-- Weather Map and Alert -->
-    <div id="weather-map-container" style="display:none; margin-top: 16px;">
+    <section id="weather-map-container" style="display:none; margin-top: 16px;">
       <div id="map" style="height:400px;"></div>
       <div id="weather-alert" style="color:red; margin-top:8px;"></div>
-    </div>
-  </div>
-  
-  <!-- Script xử lý logic -->
+    </section>
+  </main>
+  <!-- JavaScript -->
   <script>
+    // --- Sun chart logic ---
+    function timeToHour(timeStr) {
+      if (!timeStr || timeStr === '--:--') return 0;
+      const [h, m] = timeStr.split(":").map(Number);
+      return h + m / 60;
+    }
+    function hourToTimeLabel(hour) {
+      const h = Math.floor(hour);
+      const m = Math.round((hour - h) * 60);
+      return `${h}:${m.toString().padStart(2, '0')}`;
+    }
+    function drawSunChart() {
+      const sunrise = document.getElementById('sunrise').textContent.trim();
+      const sunset = document.getElementById('sunset').textContent.trim();
+      if (window.sunChartInstance) window.sunChartInstance.destroy();
+      const ctx = document.getElementById('sunChart').getContext('2d');
+      const dataArr = [timeToHour(sunrise), timeToHour(sunset)];
+      window.sunChartInstance = new Chart(ctx, {
+        type: 'bar',
+        data: {
+          labels: ['日の出', '日の入り'],
+          datasets: [{
+            label: '時刻',
+            data: dataArr,
+            backgroundColor: ['#FFD700', '#FF8C00']
+          }]
+        },
+        options: {
+          plugins: {
+            tooltip: {
+              callbacks: {
+                label: function(context) {
+                  return hourToTimeLabel(context.parsed.y);
+                }
+              }
+            }
+          },
+          scales: {
+            y: {
+              beginAtZero: true,
+              max: 24,
+              title: { display: true, text: '時' },
+              ticks: {
+                callback: function(value) {
+                  return hourToTimeLabel(value);
+                }
+              }
+            }
+          }
+        }
+      });
+    }
+    window.addEventListener('DOMContentLoaded', drawSunChart);
+
+    // --- Weather Logic ---
     const apikey = "70a0b2cb36a5ef013414269041b73822";
     const apiUrl = "https://api.openweathermap.org/data/2.5/weather?units=metric&q=";
     const forecastApiUrl = "https://api.openweathermap.org/data/2.5/forecast?units=metric&q=";
@@ -294,7 +294,6 @@
     let lastForecastData = null;
     let hourlyChart = null;
 
-    // Map icon OpenWeatherMap về ảnh trong images/
     const iconMap = {
       "Clouds": "clouds.png",
       "Rain": "rain.png",
@@ -303,22 +302,18 @@
       "Drizzle": "drizzle.png",
       "Snow": "snow.png",
       "Thunderstorm": "thunder.png",
-      "Night": "night.png",         
-      "Hurricane": "hurricane.png", 
-      "Taifuu": "taifuu.png"        
+      "Night": "night.png",
+      "Hurricane": "hurricane.png",
+      "Taifuu": "taifuu.png"
     };
 
-    // Lấy icon thời tiết (ưu tiên theo main, nếu không có thì theo icon code)
     function getIconUrl(main, icon = "") {
-      // Xử lý night icon
       if (icon && icon.endsWith('n')) return "images/night.png";
-      // Xử lý hurricane, taifuu nếu có mã đặc biệt (ví dụ: weatherId)
       if (main === "Hurricane") return "images/hurricane.png";
       if (main === "Taifuu") return "images/taifuu.png";
       return "images/" + (iconMap[main] || "clouds.png");
     }
 
-    // Hàm render biểu đồ theo tab
     function renderHourlyChart(forecastData, type = "rain") {
       if (!forecastData) return;
       const labels = forecastData.list.slice(0, 8).map(f =>
@@ -394,7 +389,6 @@
       });
     }
 
-    // Tab click event
     document.querySelectorAll('.tab-btn').forEach(btn => {
       btn.addEventListener('click', function() {
         document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
@@ -404,7 +398,6 @@
       });
     });
 
-    // Hàm lấy và fill dữ liệu
     async function checkWeather(city = "Tokyo") {
       try {
         const response = await fetch(apiUrl + encodeURIComponent(city) + '&appid=' + apikey + '&lang=ja');
@@ -430,7 +423,6 @@
         const data = await response.json();
         const forecastData = await forecastResponse.json();
 
-        // Current weather
         document.getElementById("location-name").innerText = data.name;
         document.getElementById("temperature").innerText = Math.round(data.main.temp) + "°C";
         document.getElementById("humidity").innerText = data.main.humidity + "%";
@@ -439,10 +431,8 @@
         const weatherTimeStr = new Date(data.dt * 1000).toLocaleTimeString('ja-JP', { hour: '2-digit', minute: '2-digit', second: '2-digit', timeZone: 'Asia/Tokyo' });
         document.getElementById("weather-time").innerText = weatherTimeStr;
 
-        // Weather icon (ưu tiên night icon nếu có)
         weatherImg.src = getIconUrl(data.weather[0].main, data.weather[0].icon);
 
-        // Sun info
         const sunriseTime = new Date(data.sys.sunrise * 1000).toLocaleTimeString("ja-JP", { hour: '2-digit', minute: '2-digit', timeZone: 'Asia/Tokyo' });
         const sunsetTime = new Date(data.sys.sunset * 1000).toLocaleTimeString("ja-JP", { hour: '2-digit', minute: '2-digit', timeZone: 'Asia/Tokyo' });
         document.getElementById('sunrise').textContent = sunriseTime;
@@ -452,7 +442,6 @@
         const duration = (data.sys.sunset - data.sys.sunrise) / 3600;
         document.getElementById("day-length").textContent = `${Math.floor(duration)}時間${Math.round((duration % 1) * 60)}分`;
 
-        // Daily forecast (group by day)
         const daily = {};
         forecastData.list.forEach(f => {
           const day = new Date(f.dt * 1000).toLocaleDateString("ja-JP", { weekday: 'short' });
@@ -460,7 +449,6 @@
           daily[day].push(f);
         });
         document.getElementById("daily-forecast").innerHTML = Object.entries(daily).slice(0, 7).map(([day, list]) => {
-          // Ưu tiên lấy bản ghi 12h trưa, nếu không có thì lấy bản ghi đầu tiên có main là "Clear", nếu không có thì lấy bản ghi có icon bắt đầu bằng '01' (clear sky), nếu không có thì lấy bản ghi đầu tiên
           let mid = list.find(l => new Date(l.dt * 1000).getHours() === 12)
                   || list.find(l => l.weather[0].main === "Clear")
                   || list.find(l => l.weather[0].icon && l.weather[0].icon.startsWith("01"))
@@ -478,7 +466,6 @@
           </div>`;
         }).join('');
 
-        // Fill dữ liệu cho các card dưới
         document.getElementById('temp-value').textContent = Math.round(data.main.temp) + "°";
         document.getElementById('feels-value').textContent = Math.round(data.main.feels_like) + "°";
         document.getElementById('clouds-value').textContent = data.clouds.all + "%";
@@ -488,12 +475,10 @@
         document.getElementById('visibility-value').textContent = (data.visibility/1000).toFixed(1) + " km";
         document.getElementById('pressure-value').textContent = data.main.pressure + " hPa";
 
-        // Thời gian đo gió (giờ Nhật)
         const windTimestamp = data.dt;
         const windTimeStr = new Date(windTimestamp * 1000).toLocaleTimeString('ja-JP', { hour: '2-digit', minute: '2-digit', timeZone: 'Asia/Tokyo' });
         document.getElementById("wind-time").textContent = windTimeStr;
 
-        // Biểu đồ sparkline
         const temps = forecastData.list.slice(0, 8).map(f => f.main.temp);
         drawSparkline("temp-spark", temps, "#4fd1c5");
 
@@ -525,7 +510,6 @@
       }
     }
 
-    // Search button and Enter key
     searchBtn.addEventListener("click", () => {
       checkWeather(searchInput.value);
     });
@@ -535,9 +519,8 @@
       }
     });
 
-    // Mode toggle
     document.getElementById("toggle-mode").addEventListener("click", () => {
-      const body = document.getElementById("body");
+      const body = document.body;
       if (body.classList.contains("dark-mode")) {
         body.classList.remove("dark-mode");
         body.classList.add("light-mode");
@@ -549,7 +532,6 @@
       }
     });
 
-    // Xử lý nút định vị
     document.getElementById("locate-btn").addEventListener("click", function() {
       if (navigator.geolocation) {
         navigator.geolocation.getCurrentPosition(function(position) {
@@ -576,10 +558,8 @@
       }
     });
 
-    // Initial load
     checkWeather("Tokyo");
 
-    // Sparkline function
     function drawSparkline(canvasId, data, color = "#4fd1c5") {
       const ctx = document.getElementById(canvasId).getContext('2d');
       new Chart(ctx, {
@@ -606,7 +586,6 @@
       });
     }
 
-    // 1. Giờ hiện tại trên 天気の詳細情報
     function updateWeatherDetailTime() {
       const now = new Date();
       const timeStr = now.toLocaleTimeString('ja-JP', { hour: '2-digit', minute: '2-digit', timeZone: 'Asia/Tokyo' });
@@ -615,7 +594,7 @@
     updateWeatherDetailTime();
     setInterval(updateWeatherDetailTime, 60000);
 
-    // Home icon click
+    // Sidebar navigation
     document.getElementById('home-icon').onclick = function() {
       window.location.href = 'index.html';
     };
@@ -625,9 +604,16 @@
     document.getElementById('time-icon').onclick = function() {
       window.location.href = 'time.html';
     };
-    // Thêm các tab khác nếu có file tương ứng
-    // document.getElementById('calendar-icon').onclick = function() { window.location.href = 'calendar.html'; };
-    
+    document.getElementById('calendar-icon').onclick = function() {
+      window.location.href = 'monthly forecast.html';
+    };
+    document.getElementById('cloud-icon').onclick = function() {
+      window.location.href = 'warning.html';
+    };
+    document.getElementById('smile-icon').onclick = function() {
+      window.location.href = 'note.html';
+    };
+
     function showWeatherMap() {
       if (!window.weatherMap) {
         window.weatherMap = L.map('map').setView([21.0285, 105.8542], 6); // Hà Nội mặc định
@@ -635,19 +621,9 @@
           attribution: '© OpenStreetMap'
         }).addTo(window.weatherMap);
 
-        // Thêm lớp thời tiết (clouds_new, temp_new, wind_new, precipitation_new...)
         L.tileLayer(`https://tile.openweathermap.org/map/clouds_new/{z}/{x}/{y}.png?appid=${apikey}`).addTo(window.weatherMap);
       }
-
-     
     }
   </script>
 </body>
 </html>
-
-
-
-
-
-
-
