@@ -3,18 +3,21 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>天気地図</title>
+  <title>天気地図 - WOW Map</title>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Inter:wght@400;600;900&display=swap">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
   <style>
     :root {
       --primary: #3a8fff;
       --primary-dark: #2665d4;
-      --glass: rgba(34,44,70,0.74);
-      --glass-light: rgba(255,255,255,0.13);
-      --sidebar-width: 74px;
-      --shadow: 0 8px 32px 0 rgba(31,38,135,0.18);
+      --accent: #ffe27c;
+      --bg-gradient: linear-gradient(120deg, #5bdcff 0%, #ffb6b9 100%);
+      --glass: rgba(34,44,70,0.82);
+      --glass-light: rgba(255,255,255,0.20);
+      --sidebar-width: 90px;
+      --shadow: 0 8px 32px 0 rgba(31,38,135,0.16);
       --font-main: 'Inter', 'Segoe UI', 'Noto Sans JP', Arial, sans-serif;
+      --glow: 0 0 18px var(--primary), 0 0 4px var(--accent);
     }
     * { margin: 0; padding: 0; box-sizing: border-box; }
 
@@ -25,38 +28,59 @@
 
     body {
       display: flex;
-      flex-direction: row;
       min-height: 100vh;
-      background: radial-gradient(ellipse at 60% 20%, #2e468c 0%, #232c4b 55%, #181b25 100%);
+      background: var(--bg-gradient);
       color: #f2f7fa;
+      position: relative;
+      overflow: hidden;
+    }
+
+    body::before {
+      content: '';
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      z-index: 0;
+      pointer-events: none;
+      background:
+        radial-gradient(ellipse at 60% 20%, #e5eaff 0%, #bde5ff 60%, transparent 100%),
+        radial-gradient(ellipse at 90% 85%, #ffd6e0 0%, #fff6f7 70%, transparent 100%),
+        radial-gradient(circle at 25% 70%, #ffe27c44 0%, transparent 60%);
+      opacity: 0.72;
+      filter: blur(13px) brightness(1.12);
+      animation: mapbgmove 18s infinite alternate;
+    }
+    @keyframes mapbgmove {
+      0% { filter: blur(10px) brightness(1.03);}
+      100% { filter: blur(20px) brightness(1.09);}
     }
 
     /* Sidebar Styles */
     .sidebar {
       width: var(--sidebar-width);
       background: var(--glass);
-      backdrop-filter: blur(18px);
+      backdrop-filter: blur(22px);
       display: flex;
       flex-direction: column;
       align-items: center;
-      justify-content: center;
+      justify-content: flex-start;
       position: fixed;
       left: 0;
       top: 0;
       bottom: 0;
       height: 100vh;
       z-index: 100;
-      box-shadow: 6px 0 32px 0 rgba(58, 143, 255, 0.11);
-      border-right: 1.5px solid rgba(255,255,255,0.10);
+      box-shadow: 6px 0 32px 0 rgba(58, 143, 255, 0.12);
+      border-right: 2px solid rgba(255,255,255,0.12);
+      transition: background 0.5s;
     }
 
     .sidebar-content {
       display: flex;
       flex-direction: column;
-      gap: 28px;
+      gap: 36px;
       width: 100%;
       align-items: center;
-      padding: 32px 0;
+      padding: 60px 0 0 0;
     }
 
     .sidebar-item {
@@ -64,31 +88,42 @@
       display: flex;
       justify-content: center;
       align-items: center;
-      height: 54px;
+      height: 60px;
       background: none;
       outline: none;
       border: none;
       cursor: pointer;
+      margin-bottom: 3px;
+      transition: filter 0.2s;
+      filter: drop-shadow(0 2px 11px #5bdcfb18);
     }
 
     .sidebar-icon {
-      font-size: 29px;
+      font-size: 32px;
       color: #b6c7e3;
-      transition: color 0.2s, background 0.2s, box-shadow 0.2s;
-      width: 44px;
-      height: 44px;
-      border-radius: 15px;
+      transition: color 0.25s, background 0.2s, box-shadow 0.22s;
+      width: 50px;
+      height: 50px;
+      border-radius: 16px;
       display: flex;
       align-items: center;
       justify-content: center;
       background: transparent;
-      border: 1.5px solid transparent;
+      border: 2.2px solid transparent;
     }
     .sidebar-icon:hover, .sidebar-item.active .sidebar-icon {
       background: var(--glass-light);
       color: var(--primary);
-      border-color: var(--primary);
-      box-shadow: 0 4px 14px var(--glass-light);
+      border-color: var(--accent);
+      box-shadow: var(--glow);
+      filter: brightness(1.18);
+      animation: wiggle .5s;
+    }
+    @keyframes wiggle {
+      0% { transform: rotate(-9deg);}
+      40% { transform: rotate(7deg);}
+      80% { transform: rotate(-3deg);}
+      100% { transform: rotate(0);}
     }
 
     /* Main Content Styles */
@@ -102,52 +137,116 @@
       display: flex;
       flex-direction: column;
       align-items: stretch;
+      z-index: 1;
+      transition: margin-left 0.3s;
+    }
+
+    .wow-glass {
+      background: rgba(255,255,255,0.64);
+      border-radius: 38px;
+      box-shadow: 0 10px 40px 0 rgba(31,38,135,0.17), 0 1px 18px 0 #b5c6f622;
+      padding: 42px 28px 32px 28px;
+      margin: 36px auto 22px auto;
+      max-width: 1420px;
+      width: 97%;
+      position: relative;
+      min-height: 88vh;
+      border: 2.6px solid #f0f7ff44;
+      backdrop-filter: blur(9px);
+      animation: fadein 1.2s;
+    }
+    @keyframes fadein {
+      from { opacity: 0; transform: translateY(42px);}
+      to { opacity: 1; transform: translateY(0);}
     }
 
     .tab-menu {
       display: flex;
-      gap: 16px;
+      gap: 22px;
       justify-content: center;
-      margin: 32px auto 18px auto;
+      margin: 0 auto 28px auto;
       width: 100%;
-      max-width: 540px;
+      max-width: 750px;
       z-index: 2;
       position: relative;
+      background: rgba(255,255,255,0.18);
+      border-radius: 999px;
+      box-shadow: 0 0 30px #9be9ff14;
+      padding: 8px 0;
     }
     .tab-btn {
       background: transparent;
-      color: var(--primary);
-      border: 1.7px solid var(--primary);
+      color: var(--primary-dark);
+      border: 2.2px solid var(--primary);
       border-radius: 999px;
-      padding: 10px 32px;
-      font-weight: 700;
+      padding: 13px 38px;
+      font-weight: 900;
       font-size: 1.13rem;
       cursor: pointer;
-      transition: background 0.17s, color 0.17s, border 0.17s;
-      box-shadow: 0 2px 8px 0 rgba(58,143,255,.08);
+      transition: background 0.19s, color 0.19s, border 0.19s, box-shadow 0.19s;
+      box-shadow: 0 2px 12px 0 rgba(58,143,255,.11);
       outline: none;
+      letter-spacing: 1.2px;
+      margin-bottom: 0;
+      position: relative;
+      overflow: hidden;
+      isolation: isolate;
     }
     .tab-btn.active, .tab-btn:hover {
-      background: var(--primary);
-      color: #fff;
+      background: linear-gradient(90deg, #ffe27c 0%, #5bdcff 100%);
+      color: #03445e !important;
       border-color: var(--primary-dark);
+      box-shadow: 0 0 22px #ffe27c41, 0 1px 8px #5bdcff38;
+      filter: brightness(1.17);
+    }
+    .tab-btn.active:after, .tab-btn:hover:after {
+      content: '';
+      position: absolute;
+      left: 0; right: 0; bottom: 0; top: 0;
+      border-radius: 999px;
+      box-shadow: 0 0 18px #ffe27c55, 0 2px 7px #5bdcff19;
+      opacity: 0.32;
+      pointer-events: none;
+      z-index: -1;
+    }
+
+    .wow-title {
+      font-size: 2.25rem;
+      font-weight: 900;
+      color: #2d3a5a;
+      letter-spacing: 2px;
+      margin-bottom: 22px;
+      text-align: center;
+      text-shadow: 0 6px 32px rgba(58,143,255,0.11);
+      line-height: 1.12;
+      filter: drop-shadow(0 2px 9px #ffe27c22);
+      user-select: none;
+    }
+    .wow-title .emoji {
+      font-size: 1.5em;
+      vertical-align: middle;
+      margin-right: 7px;
+      margin-left: 3px;
+      filter: blur(0.3px) drop-shadow(0 4px 9px #ffe27c99);
     }
 
     #windy-map {
       width: 100%;
-      height: calc(100vh - 100px);
+      height: 66vh;
       border: none;
       display: block;
-      background: #f1f5f9;
+      background: #f0f8ff;
       border-radius: 28px;
-      box-shadow: 0 8px 32px 0 rgba(31,38,135,0.13);
+      box-shadow: 0 8px 32px 0 rgba(31,38,135,0.13), 0 2px 24px #5bdcff55;
       margin: 0 auto;
+      transition: box-shadow 0.18s, border-radius 0.18s;
+      animation: fadein 1.6s;
     }
 
     /* Loading State */
     .loading {
       position: absolute;
-      top: 50%;
+      top: 52%;
       left: 50%;
       transform: translate(-50%, -50%);
       display: flex;
@@ -158,42 +257,52 @@
     }
 
     .loading-spinner {
-      width: 40px;
-      height: 40px;
-      border: 3px solid #e2e8f0;
-      border-top: 3px solid #38bdf8;
+      width: 44px;
+      height: 44px;
+      border: 3.8px solid #e2e8f0;
+      border-top: 3.8px solid #38bdf8;
       border-radius: 50%;
       animation: spin 1s linear infinite;
+      box-shadow: 0 0 22px #5bdcff;
     }
 
     .loading-text {
       color: #64748b;
-      font-size: 14px;
-      font-weight: 500;
+      font-size: 15px;
+      font-weight: 700;
+      text-shadow: 0 1px 4px #fff;
+      letter-spacing: 1.2px;
     }
 
     @keyframes spin {
-      0% { transform: rotate(0deg); }
-      100% { transform: rotate(360deg); }
+      0% { transform: rotate(0deg);}
+      100% { transform: rotate(360deg);}
     }
-
     /* Responsive Design */
-    @media (max-width: 900px) {
-      .sidebar { width: 49px; }
-      .sidebar-content { padding: 18px 0; gap: 19px; }
-      .main-map-content { margin-left: 49px; }
-      .sidebar-icon { width: 30px; height: 30px; font-size: 20px; }
-      .tab-menu { gap: 7px; padding: 0 4px; }
-      #windy-map { border-radius: 18px; }
+    @media (max-width: 1100px) {
+      .wow-glass { max-width: 100vw; padding: 18px 2vw; }
+      #windy-map { border-radius: 18px; height: 56vh;}
+      .wow-title { font-size: 1.1rem; }
+      .tab-menu { flex-wrap: wrap; gap: 10px; }
     }
-    @media (max-width: 600px) {
-      .tab-menu { flex-wrap: wrap; gap: 4px; font-size: 0.95rem; }
-      #windy-map { height: calc(100vh - 95px); border-radius: 10px; }
+    @media (max-width: 700px) {
+      .sidebar { width: 48px; }
+      .main-map-content { margin-left: 48px; }
+      .sidebar-content { padding: 18px 0; gap: 19px; }
+      .sidebar-icon { width: 28px; height: 28px; font-size: 20px; }
+      .tab-menu { gap: 6px; padding: 0 4px; }
+      #windy-map { border-radius: 11px; height: 42vh; }
+      .wow-glass { padding: 12px 5px;}
+      .wow-title { font-size: 0.98rem;}
+    }
+    @media (max-width: 420px) {
+      .wow-title { font-size: 0.88rem;}
+      .tab-btn { font-size: 0.82rem; padding: 6px 11px;}
+      #windy-map { height: 33vh; }
     }
   </style>
 </head>
 <body>
-  <!-- Sidebar Navigation -->
   <div class="sidebar">
     <div class="sidebar-content">
       <button class="sidebar-item" id="home-icon" title="ホーム">
@@ -211,58 +320,51 @@
       <button class="sidebar-item" id="cloud-icon" title="天気警報">
         <i class="fa-solid fa-cloud sidebar-icon"></i>
       </button>
-      <button class="sidebar-item" id="smile-icon" title="メモ">
-        <i class="fa-regular fa-face-smile sidebar-icon"></i>
-      </button>
     </div>
   </div>
-
-  <!-- Main Map Content -->
   <div class="main-map-content">
-    <!-- Tab menu giống phần index -->
-    <nav class="tab-menu" aria-label="地図レイヤー">
-      <button class="tab-btn active" data-overlay="rain">雨</button>
-      <button class="tab-btn" data-overlay="wind">風</button>
-      <button class="tab-btn" data-overlay="temp">気温</button>
-      <button class="tab-btn" data-overlay="clouds">雲</button>
-      <button class="tab-btn" data-overlay="pressure">気圧</button>
-      <button class="tab-btn" data-overlay="snow">雪</button>
-      <button class="tab-btn" data-overlay="radar">レーダー</button>
-    </nav>
-    <!-- Loading State -->
-    <div class="loading" id="loading">
-      <div class="loading-spinner"></div>
-      <div class="loading-text">天気地図を読み込み中...</div>
+    <div class="wow-glass">
+      <div class="wow-title">
+        <span class="emoji">🗾</span>
+        天気地図 <span style="font-size:1.1rem; font-weight:600; color:#5bdcff;">Windy.comリアルタイム</span>
+      </div>
+      <nav class="tab-menu" aria-label="地図レイヤー">
+        <button class="tab-btn active" data-overlay="rain">雨</button>
+        <button class="tab-btn" data-overlay="wind">風</button>
+        <button class="tab-btn" data-overlay="temp">気温</button>
+        <button class="tab-btn" data-overlay="clouds">雲</button>
+        <button class="tab-btn" data-overlay="pressure">気圧</button>
+        <button class="tab-btn" data-overlay="snow">雪</button>
+        <button class="tab-btn" data-overlay="radar">レーダー</button>
+      </nav>
+      <div class="loading" id="loading">
+        <div class="loading-spinner"></div>
+        <div class="loading-text">天気地図を読み込み中...</div>
+      </div>
+      <iframe
+        id="windy-map"
+        src="https://embed.windy.com/embed2.html?lat=25&lon=135&zoom=5&level=surface&overlay=rain&menu=&message=true&marker=&calendar=now&pressure=&type=map&location=coordinates&detail=&metricWind=default&metricTemp=default&radarRange=-1"
+        allowfullscreen
+        loading="lazy">
+      </iframe>
     </div>
-
-    <!-- Windy Map Embed -->
-    <iframe
-      id="windy-map"
-      src="https://embed.windy.com/embed2.html?lat=25&lon=135&zoom=5&level=surface&overlay=rain&menu=&message=true&marker=&calendar=now&pressure=&type=map&location=coordinates&detail=&metricWind=default&metricTemp=default&radarRange=-1"
-      allowfullscreen
-      loading="lazy">
-    </iframe>
   </div>
-
   <script>
     // Navigation Functions
     const navigation = {
       home: () => window.location.href = 'index.html',
       weatherMap: () => window.location.href = 'maps.html',
       time: () => window.location.href = 'time.html',
-      calendar: () => window.location.href = 'monthly forecast.html',
+      calendar: () => window.location.href = 'monthly-forecast.html',
       cloud: () => window.location.href = 'warning.html',
-      smile: () => window.location.href = 'note.html'
     };
 
-    // Sidebar navigation
     document.addEventListener('DOMContentLoaded', function() {
       document.getElementById('home-icon').addEventListener('click', navigation.home);
       document.getElementById('weather-map-icon').addEventListener('click', navigation.weatherMap);
       document.getElementById('time-icon').addEventListener('click', navigation.time);
       document.getElementById('calendar-icon').addEventListener('click', navigation.calendar);
       document.getElementById('cloud-icon').addEventListener('click', navigation.cloud);
-      document.getElementById('smile-icon').addEventListener('click', navigation.smile);
 
       // Hide loading when iframe loads
       const iframe = document.getElementById('windy-map');
@@ -270,8 +372,6 @@
       iframe.addEventListener('load', function() {
         loading.style.display = 'none';
       });
-
-      // Handle iframe load error
       iframe.addEventListener('error', function() {
         loading.innerHTML = `
           <div style="color: #ef4444; text-align: center;">
@@ -280,22 +380,18 @@
           </div>
         `;
       });
-
       // Tab menu - đổi lớp overlay của windy map
       document.querySelectorAll('.tab-btn').forEach(btn => {
         btn.addEventListener('click', function() {
           document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
           this.classList.add('active');
           const overlay = this.dataset.overlay;
-
-          // Xây lại URL với lớp overlay mới
           const url = `https://embed.windy.com/embed2.html?lat=25&lon=135&zoom=5&level=surface&overlay=${overlay}&menu=&message=true&marker=&calendar=now&pressure=&type=map&location=coordinates&detail=&metricWind=default&metricTemp=default&radarRange=-1`;
           iframe.src = url;
           loading.style.display = 'flex';
         });
       });
     });
-
     // Keyboard navigation
     document.addEventListener('keydown', function(e) {
       if (e.ctrlKey || e.metaKey) {
@@ -305,7 +401,6 @@
           case '3': e.preventDefault(); navigation.time(); break;
           case '4': e.preventDefault(); navigation.calendar(); break;
           case '5': e.preventDefault(); navigation.cloud(); break;
-          case '6': e.preventDefault(); navigation.smile(); break;
         }
       }
     });

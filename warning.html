@@ -13,7 +13,68 @@
       background: linear-gradient(120deg, #f8fafc 0%, #e0f2fe 100%);
       min-height: 100vh;
     }
-    .sidebar { box-shadow: 2px 0 12px rgba(0,0,0,0.1); }
+    .sidebar { 
+      box-shadow: 2px 0 12px rgba(0,0,0,0.1); 
+      width: 80px !important; 
+      background: rgba(34,44,70,0.82) !important;
+      backdrop-filter: blur(18px) !important;
+      border-right: 1.5px solid rgba(255,255,255,0.10) !important;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      position: fixed;
+      left: 0;
+      top: 0;
+      bottom: 0;
+      height: 100vh;
+      z-index: 1000;
+    }
+    .sidebar-content {
+      display: flex;
+      flex-direction: column;
+      gap: 36px;
+      width: 100%;
+      align-items: center;
+      padding: 40px 0 28px 0;
+    }
+    .sidebar-item {
+      width: 100%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 58px;
+      background: none;
+      outline: none;
+      border: none;
+      cursor: pointer;
+      transition: background 0.2s;
+      border-radius: 15px;
+    }
+    .sidebar-item.active,
+    .sidebar-item:hover {
+      background: rgba(255,255,255,0.13);
+    }
+    .sidebar-icon {
+      font-size: 32px !important;
+      color: #b6c7e3 !important;
+      transition: color 0.2s, background 0.2s, box-shadow 0.2s;
+      width: 48px;
+      height: 48px;
+      border-radius: 15px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: transparent;
+      border: 1.5px solid transparent;
+    }
+    .sidebar-item.active .sidebar-icon,
+    .sidebar-item:hover .sidebar-icon {
+      color: #3a8fff !important;
+      border-color: #3a8fff !important;
+      background: rgba(255,255,255,0.21) !important;
+      box-shadow: 0 4px 14px rgba(255,255,255,0.13) !important;
+    }
     .scrollbar-hide::-webkit-scrollbar { display: none; }
     .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
     .dot { 
@@ -31,16 +92,19 @@
       background: rgba(255,255,255,0.95); 
       box-shadow: 0 4px 24px rgba(0,0,0,0.08); 
       border: 1px solid rgba(255,255,255,0.2);
+      padding: 2rem !important;
     }
     .chart-bg { 
       background: linear-gradient(135deg, #e0f2fe 0%, #bae6fd 100%); 
       border-radius: 1rem; 
+      padding: 1.5rem !important;
     }
     .alert-box { 
       background: #ef4444; 
       color: #fff; 
       border-radius: 0.5rem; 
-      padding: 0.75rem 1rem; 
+      padding: 22px !important;
+      font-size: 1.2rem !important;
       font-weight: 600; 
       margin-bottom: 1rem; 
       box-shadow: 0 2px 8px rgba(0,0,0,0.1); 
@@ -58,81 +122,67 @@
       background-size: contain;
       color: #3b82f6;
     }
-    
-    /* Fixed Layout Styles */
     .main-container {
       display: flex;
-      max-width: 1400px;
+      max-width: 1480px;
       margin: 0 auto;
-      gap: 1.5rem;
+      justify-content: space-between;
+      gap: 2rem;
     }
-    
-    .left-panel {
-      width: 380px;
-      flex-shrink: 0;
-    }
-    
-    .right-panel {
+    .left-panel, .right-panel {
+      min-width: 460px;
+      max-width: 650px;
       flex: 1;
-      min-width: 0;
     }
-    
-    /* Responsive Design */
+    .font-bold, .font-semibold, .text-xl, .text-2xl {
+      font-size: 2.2rem !important;
+    }
+    .h-32 { height: 180px !important; }
+    .h-24 { height: 120px !important; }
+    @media (max-width: 1200px) {
+      .main-container { max-width: 100vw; gap: 1rem; }
+      .left-panel, .right-panel { min-width: 300px; max-width: 100vw; }
+    }
     @media (max-width: 1024px) {
-      .main-container {
-        flex-direction: column;
-      }
-      .left-panel {
-        width: 100%;
-      }
-      .bg-weather {
-        width: 200px;
-        height: 200px;
-      }
+      .main-container { flex-direction: column; }
+      .left-panel, .right-panel { width: 100%; min-width: 0; max-width: 100vw; }
+      .bg-weather { width: 200px; height: 200px; }
     }
-    
     @media (max-width: 768px) {
-      .bg-weather {
-        display: none;
-      }
-      .main-container {
-        gap: 1rem;
-      }
+      .bg-weather { display: none; }
+      .main-container { gap: 1rem; }
+      .sidebar { width: 56px !important; }
+      .sidebar-content { gap: 16px; padding: 14px 0; }
+      .sidebar-icon { width: 30px !important; height: 30px !important; font-size: 20px !important; }
     }
   </style>
 </head>
 <body class="min-h-screen flex flex-col">
 
-  <!-- Weather Background -->
   <div class="bg-weather"></div>
 
   <!-- Sidebar Navigation -->
-  <nav class="sidebar fixed left-0 top-0 bottom-0 w-16 flex flex-col items-center justify-center bg-slate-900/90 z-50">
-    <div class="flex flex-col gap-4 items-center py-6 w-full">
-      <button id="home-icon" class="p-2 hover:bg-blue-700 rounded text-white transition-colors">
-        <i class="fa-solid fa-house text-xl"></i>
+  <nav class="sidebar">
+    <div class="sidebar-content">
+      <button id="home-icon" class="sidebar-item" title="ホーム">
+        <i class="fa-solid fa-house sidebar-icon"></i>
       </button>
-      <button id="weather-map-icon" class="p-2 hover:bg-blue-700 rounded text-white transition-colors">
-        <i class="fa-solid fa-map-location-dot text-xl"></i>
+      <button id="weather-map-icon" class="sidebar-item" title="天気地図">
+        <i class="fa-solid fa-map-location-dot sidebar-icon"></i>
       </button>
-      <button id="time-icon" class="p-2 hover:bg-blue-700 rounded text-white transition-colors">
-        <i class="fa-regular fa-clock text-xl"></i>
+      <button id="time-icon" class="sidebar-item" title="時間">
+        <i class="fa-regular fa-clock sidebar-icon"></i>
       </button>
-      <button id="calendar-icon" class="p-2 hover:bg-blue-700 rounded text-white transition-colors">
-        <i class="fa-regular fa-calendar text-xl"></i>
+      <button id="calendar-icon" class="sidebar-item" title="カレンダー">
+        <i class="fa-regular fa-calendar sidebar-icon"></i>
       </button>
-      <button id="cloud-icon" class="p-2 hover:bg-blue-700 rounded text-white transition-colors">
-        <i class="fa-solid fa-cloud text-xl"></i>
-      </button>
-      <button id="smile-icon" class="p-2 bg-blue-600 rounded shadow text-cyan-300">
-        <i class="fa-regular fa-face-smile text-xl"></i>
+      <button id="cloud-icon" class="sidebar-item active" title="天気警報">
+        <i class="fa-solid fa-cloud sidebar-icon"></i>
       </button>
     </div>
   </nav>
 
-  <!-- Main Content Wrapper -->
-  <div class="flex-1 flex flex-col ml-16 relative z-10">
-    <!-- Header -->
+  <div class="flex-1 flex flex-col ml-20 relative z-10">
     <header class="flex items-center justify-between px-6 py-4 bg-white/90 shadow-sm backdrop-blur-sm">
       <div class="flex items-center gap-3">
         <span class="font-bold text-2xl text-blue-900">生活</span>
@@ -146,35 +196,17 @@
           <option value="nagoya">名古屋</option>
           <option value="sapporo">札幌</option>
         </select>
-        <button class="p-2 rounded-lg bg-blue-600 text-white hover:bg-blue-700 transition-colors">
+        <button id="refresh-btn" class="p-2 rounded-lg bg-blue-600 text-white hover:bg-blue-700 transition-colors">
           <i class="fa-solid fa-sync-alt"></i>
         </button>
       </div>
     </header>
-
-    <!-- Main Content with Fixed Layout -->
     <main class="flex-1 p-6">
       <div class="main-container">
         <!-- Left Panel -->
         <aside class="left-panel flex flex-col gap-6">
-          <!-- Date Navigation -->
-          <div class="flex gap-2 overflow-x-auto scrollbar-hide pb-2">
-            <button class="bg-blue-600 text-white rounded-lg px-4 py-2 font-semibold shadow hover:bg-blue-700 whitespace-nowrap transition-colors">
-              今日 34° 26°
-            </button>
-            <button class="bg-blue-400 text-white rounded-lg px-4 py-2 font-semibold shadow hover:bg-blue-500 whitespace-nowrap transition-colors">
-              8日(火)
-            </button>
-            <button class="bg-blue-400 text-white rounded-lg px-4 py-2 font-semibold shadow hover:bg-blue-500 whitespace-nowrap transition-colors">
-              9日(水)
-            </button>
-            <button class="bg-blue-400 text-white rounded-lg px-4 py-2 font-semibold shadow hover:bg-blue-500 whitespace-nowrap transition-colors">
-              10日(木)
-            </button>
-          </div>
-
-          <!-- Life Index Card -->
-          <div class="card rounded-2xl p-6 shadow-lg">
+          <div id="date-nav" class="flex gap-2 overflow-x-auto scrollbar-hide pb-2"></div>
+          <div class="card rounded-2xl shadow-lg">
             <div class="flex gap-4 border-b border-blue-200 pb-3 mb-4">
               <span class="font-semibold text-blue-900 border-b-2 border-blue-600 pb-1 cursor-pointer">
                 健康と安全
@@ -235,17 +267,13 @@
             </div>
           </div>
         </aside>
-
         <!-- Right Panel -->
         <section class="right-panel flex flex-col gap-6">
-          <!-- Alert Box -->
           <div id="alert-box" class="alert-box">
             ⚠️ 熱中症の危険があります。水分補給・休憩を心がけてください。<br>
             ⚠️ UV指数が高いです。日焼け止めや帽子を使いましょう。
           </div>
-
-          <!-- Main Detail Card -->
-          <div class="card rounded-2xl p-6 shadow-lg flex flex-col gap-6">
+          <div class="card rounded-2xl shadow-lg flex flex-col gap-6">
             <div class="flex items-center gap-3 mb-2">
               <i class="fa-solid fa-umbrella text-blue-500 text-xl"></i>
               <span class="font-semibold text-xl text-blue-900">傘</span>
@@ -254,17 +282,13 @@
             <div id="umbrella-detail-desc" class="text-blue-700 mb-4 p-3 bg-blue-50 rounded-lg">
               午前は晴れており、傘は必要ありません。午後も雨の予報はありません。
             </div>
-            
-            <!-- Umbrella Necessity Chart -->
-            <div class="chart-bg p-4 mb-4">
+            <div class="chart-bg mb-4">
               <h3 class="text-sm font-semibold text-blue-900 mb-3">傘の必要性 (24時間)</h3>
               <div class="h-32">
                 <canvas id="warningChart"></canvas>
               </div>
             </div>
-            
-            <!-- Temperature Chart -->
-            <div class="chart-bg p-4">
+            <div class="chart-bg">
               <h3 class="text-sm font-semibold text-blue-900 mb-3">気温 (24時間)</h3>
               <div class="h-24">
                 <canvas id="tempChart"></canvas>
@@ -287,17 +311,12 @@
       else if (status === "bad") dot.classList.add("dot-bad");
       else dot.classList.add("dot-gray");
     }
-
-    // Safe element update
     function updateElement(id, value) {
       const element = document.getElementById(id);
       if (element) element.textContent = value;
     }
-
-    // UI update function
     function updateUI(data) {
       if (!data) return;
-      
       updateElement("city-label", data.cityLabel);
       updateElement("need-umbrella", data.umbrella.text);
       updateElement("outdoor-status", data.outdoor.text);
@@ -307,15 +326,11 @@
       updateElement("heatstroke", data.heatstroke.text);
       updateElement("umbrella-detail-status", data.umbrella.text);
       updateElement("umbrella-detail-desc", data.umbrella.desc);
-
-      // Update status dots
       setDot("umbrella-dot", data.umbrella.dot);
       setDot("outdoor-dot", data.outdoor.dot);
       setDot("uv-dot", data.uv.dot);
       setDot("driving-dot", data.driving.dot);
       setDot("heatstroke-dot", data.heatstroke.dot);
-
-      // Update alerts
       const alertBox = document.getElementById("alert-box");
       let alertMsg = "";
       if (data.heatstroke.dot === "bad") alertMsg += "⚠️ 熱中症の危険があります。水分補給・休憩を心がけてください。<br>";
@@ -325,13 +340,9 @@
         alertBox.innerHTML = alertMsg;
         alertBox.style.display = alertMsg ? "block" : "none";
       }
-
-      // Update charts
       drawUmbrellaChart(data.umbrellaChart || [4,4,4,4,4,4,4,4,4,4,4,4,4]);
       drawTemperatureChart(data.tempHours || [], data.tempValues || []);
     }
-
-    // City data
     const cityData = {
       yokohama: {
         cityLabel: "横浜市",
@@ -394,22 +405,13 @@
         umbrellaChart: [4,4,4,4,4,4,4,4,4,4,4,4,4]
       }
     };
-
-    // Chart variables
     let warningChart = null;
     let tempChart = null;
-
-    // Draw umbrella chart
     function drawUmbrellaChart(umbrellaLevels) {
       const ctx = document.getElementById('warningChart');
       if (!ctx) return;
-      
-      if (warningChart) {
-        warningChart.destroy();
-      }
-
+      if (warningChart) warningChart.destroy();
       const hours = ["11:00","13:00","15:00","17:00","19:00","21:00","23:00","01:00","03:00","05:00","07:00","09:00"];
-      
       warningChart = new Chart(ctx, {
         type: 'bar',
         data: {
@@ -417,8 +419,8 @@
           datasets: [{
             label: '傘レベル',
             data: umbrellaLevels,
-            backgroundColor: 'rgba(59, 130, 246, 0.8)',
-            borderColor: 'rgba(59, 130, 246, 1)',
+            backgroundColor: 'rgba(59,130,246,0.8)',
+            borderColor: 'rgba(59,130,246,1)',
             borderWidth: 1,
             borderRadius: 4,
             barPercentage: 0.6,
@@ -428,9 +430,7 @@
         options: {
           responsive: true,
           maintainAspectRatio: false,
-          plugins: {
-            legend: { display: false }
-          },
+          plugins: { legend: { display: false }},
           scales: {
             y: {
               min: 0,
@@ -445,34 +445,20 @@
                 color: "#374151",
                 font: { size: 11 }
               },
-              grid: { 
-                color: "rgba(107, 114, 128, 0.2)",
-                drawBorder: false
-              }
+              grid: { color: "rgba(107,114,128,0.2)", drawBorder: false }
             },
             x: {
-              ticks: { 
-                color: "#374151", 
-                font: { size: 10 }
-              },
-              grid: { 
-                display: false
-              }
+              ticks: { color: "#374151", font: { size: 10 }},
+              grid: { display: false }
             }
           }
         }
       });
     }
-
-    // Draw temperature chart
     function drawTemperatureChart(hours, temps) {
       const ctx = document.getElementById('tempChart');
       if (!ctx) return;
-      
-      if (tempChart) {
-        tempChart.destroy();
-      }
-
+      if (tempChart) tempChart.destroy();
       tempChart = new Chart(ctx, {
         type: 'line',
         data: {
@@ -480,12 +466,12 @@
           datasets: [{
             label: '気温',
             data: temps,
-            borderColor: 'rgba(239, 68, 68, 1)',
-            backgroundColor: 'rgba(239, 68, 68, 0.1)',
+            borderColor: 'rgba(239,68,68,1)',
+            backgroundColor: 'rgba(239,68,68,0.1)',
             borderWidth: 2,
             fill: true,
             tension: 0.4,
-            pointBackgroundColor: 'rgba(239, 68, 68, 1)',
+            pointBackgroundColor: 'rgba(239,68,68,1)',
             pointBorderColor: '#fff',
             pointBorderWidth: 2,
             pointRadius: 3
@@ -494,9 +480,7 @@
         options: {
           responsive: true,
           maintainAspectRatio: false,
-          plugins: {
-            legend: { display: false }
-          },
+          plugins: { legend: { display: false }},
           scales: {
             y: {
               ticks: {
@@ -506,59 +490,64 @@
                 color: "#374151",
                 font: { size: 11 }
               },
-              grid: { 
-                color: "rgba(107, 114, 128, 0.2)",
-                drawBorder: false
-              }
+              grid: { color: "rgba(107,114,128,0.2)", drawBorder: false }
             },
             x: {
-              ticks: { 
-                color: "#374151", 
-                font: { size: 10 }
-              },
-              grid: { 
-                display: false
-              }
+              ticks: { color: "#374151", font: { size: 10 }},
+              grid: { display: false }
             }
           }
         }
       });
     }
-
-    // Sidebar navigation
     document.addEventListener("DOMContentLoaded", function() {
-      // Initialize with Yokohama data
+      // Date navigation
+      const weekDays = ["日", "月", "火", "水", "木", "金", "土"];
+      const dateNav = document.getElementById("date-nav");
+      if (dateNav) {
+        const today = new Date();
+        for(let i = 0; i < 5; i++) {
+          const d = new Date(today);
+          d.setDate(today.getDate() + i);
+          let btn = document.createElement("button");
+          btn.className = "rounded-lg px-4 py-2 font-semibold shadow whitespace-nowrap transition-colors";
+          if(i === 0) {
+            btn.className += " bg-blue-600 text-white hover:bg-blue-700";
+            btn.innerText = `今日`;
+          } else {
+            btn.className += " bg-blue-400 text-white hover:bg-blue-500";
+            btn.innerText = `${d.getDate()}日(${weekDays[d.getDay()]})`;
+          }
+          dateNav.appendChild(btn);
+        }
+      }
+      // Initialize UI
       updateUI(cityData.yokohama);
-      
-      // City selector change handler
       document.getElementById("city-select").addEventListener("change", function() {
         const selectedCity = this.value;
         if (cityData[selectedCity]) {
           updateUI(cityData[selectedCity]);
         }
       });
-
-      // Sidebar navigation event listeners
+      document.getElementById('refresh-btn').onclick = function() {
+        const city = document.getElementById("city-select").value;
+        updateUI(cityData[city]);
+      };
       document.getElementById('home-icon').onclick = function() {
         window.location.href = 'index.html';
       };
-      
       document.getElementById('weather-map-icon').onclick = function() {
         window.location.href = 'maps.html';
       };
-      
       document.getElementById('time-icon').onclick = function() {
         window.location.href = 'time.html';
       };
-      
       document.getElementById('calendar-icon').onclick = function() {
-        window.location.href = 'monthly-forecast.html';
+        window.location.href = 'monthly forecast.html';
       };
-      
       document.getElementById('cloud-icon').onclick = function() {
         window.location.href = 'warning.html';
       };
-
     });
   </script>
 </body>

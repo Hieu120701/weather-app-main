@@ -6,78 +6,99 @@
   <title>月間予報</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
   <style>
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
-
     body {
       background: url('https://images.unsplash.com/photo-1501854140801-50d01698950b?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1950&q=80') no-repeat center center fixed;
       background-size: cover;
       display: flex;
       flex-direction: row;
       min-height: 100vh;
-      font-family: 'Arial', sans-serif;
+      font-family: 'Arial', 'Inter', sans-serif;
     }
-
-    /* Sidebar styles */
     .sidebar {
-      width: 60px;
-      background-color: rgba(0, 0, 0, 0.8);
+      width: 80px;
+      background: rgba(34,44,70,0.92);
+      backdrop-filter: blur(18px);
+      box-shadow: 6px 0 32px 0 rgba(58,143,255,0.13);
+      border-right: 2px solid rgba(255,255,255,0.13);
       display: flex;
       flex-direction: column;
       align-items: center;
-      padding: 20px 0;
+      justify-content: center;
       position: fixed;
+      left: 0;
+      top: 0;
+      bottom: 0;
       height: 100vh;
       z-index: 1000;
     }
-
     .sidebar-content {
       display: flex;
       flex-direction: column;
-      gap: 20px;
+      gap: 36px;
       width: 100%;
+      align-items: center;
+      padding: 40px 0 28px 0;
     }
-
     .sidebar-item {
+      width: 100%;
       display: flex;
       justify-content: center;
       align-items: center;
-      width: 40px;
-      height: 40px;
-      border-radius: 8px;
-      transition: background-color 0.3s;
+      height: 58px;
+      background: none;
+      outline: none;
+      border: none;
       cursor: pointer;
+      transition: background 0.2s;
+      border-radius: 15px;
+      position: relative;
+      overflow: visible;
     }
-
-    .sidebar-item:hover {
-      background-color: rgba(255, 255, 255, 0.1);
-    }
-
-    .sidebar-item.active {
-      background-color: #f7c948;
-    }
-
     .sidebar-icon {
-      font-size: 20px;
-      color: white;
+      font-size: 32px;
+      color: #b6c7e3;
+      transition: color 0.2s, background 0.2s, box-shadow 0.2s, transform 0.5s cubic-bezier(.76,-0.18,.56,1.6);
+      width: 48px;
+      height: 48px;
+      border-radius: 15px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: transparent;
+      border: 1.5px solid transparent;
+      animation: iconIdle 2.6s infinite linear;
     }
-
-    .sidebar-item.active .sidebar-icon {
-      color: #333;
+    .sidebar-item.active .sidebar-icon,
+    .sidebar-item:hover .sidebar-icon {
+      color: #3a8fff;
+      border-color: #3a8fff;
+      background: rgba(255,255,255,0.21);
+      box-shadow: 0 4px 14px rgba(255,255,255,0.13);
+      animation: iconBounce 0.8s;
+      animation-iteration-count: 1;
     }
-
+    @keyframes iconIdle {
+      0%   { transform: scale(1) rotate(0deg);}
+      10%  { transform: scale(1.07) rotate(-6deg);}
+      20%  { transform: scale(1.06) rotate(6deg);}
+      25%  { transform: scale(1) rotate(0deg);}
+      100% { transform: scale(1) rotate(0deg);}
+    }
+    @keyframes iconBounce {
+      0%   { transform: scale(1) translateY(0);}
+      30%  { transform: scale(1.15) translateY(-15px);}
+      45%  { transform: scale(0.97) translateY(5px);}
+      60%  { transform: scale(1.08) translateY(-8px);}
+      100% { transform: scale(1) translateY(0);}
+    }
     .main-content {
-      margin-left: 60px;
+      margin-left: 80px;
       flex: 1;
-      padding: 20px;
+      padding: 24px;
       display: flex;
       flex-direction: column;
       align-items: center;
     }
-
     .location-header {
       display: flex;
       align-items: center;
@@ -85,53 +106,57 @@
       color: white;
       font-size: 24px;
       font-weight: bold;
+      gap: 12px;
+      text-shadow: 0 2px 12px #00000050;
     }
-
     .location-header i {
-      margin-right: 10px;
-      font-size: 24px;
+      margin-right: 3px;
+      font-size: 28px;
+      animation: iconIdle 2.8s infinite linear;
     }
-
     .month-navigation {
       display: flex;
       flex-wrap: wrap;
       justify-content: center;
-      gap: 5px;
+      gap: 7px;
       margin-bottom: 20px;
       width: 100%;
-      max-width: 1000px;
+      max-width: 920px;
     }
-
     .month-btn {
       background-color: rgba(0, 0, 0, 0.5);
       color: white;
       border: none;
-      border-radius: 5px;
-      padding: 10px 15px;
+      border-radius: 7px;
+      padding: 10px 18px;
       cursor: pointer;
-      transition: background-color 0.3s;
+      transition: background-color 0.3s, transform 0.2s;
       font-size: 16px;
-      min-width: 60px;
+      min-width: 62px;
+      font-weight: 500;
+      position: relative;
+      z-index: 1;
     }
-
     .month-btn.active {
       background-color: #f7c948;
       color: #333;
       font-weight: bold;
+      box-shadow: 0 2px 8px #f7c94855;
+      transform: scale(1.08);
     }
-
     .month-btn:hover:not(.active) {
-      background-color: rgba(0, 0, 0, 0.7);
+      background-color: rgba(0,0,0,0.7);
+      transform: scale(1.07);
     }
-
     .calendar-container {
-      background-color: rgba(0, 0, 0, 0.5);
-      border-radius: 10px;
+      background-color: rgba(0,0,0,0.46);
+      border-radius: 14px;
       padding: 20px;
       width: 100%;
-      max-width: 1000px;
+      max-width: 920px;
+      box-shadow: 0 6px 24px #00000030;
+      backdrop-filter: blur(6px);
     }
-
     .weekdays {
       display: grid;
       grid-template-columns: repeat(7, 1fr);
@@ -140,18 +165,19 @@
       font-weight: bold;
       margin-bottom: 10px;
       padding: 10px 0;
-      border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+      border-bottom: 1px solid rgba(255,255,255,0.19);
+      text-shadow: 0 1px 5px #0000003a;
+      font-size: 15px;
+      letter-spacing: 1px;
     }
-
     .calendar-grid {
       display: grid;
       grid-template-columns: repeat(7, 1fr);
       gap: 10px;
     }
-
     .calendar-day {
-      background-color: rgba(0, 0, 0, 0.3);
-      border-radius: 5px;
+      background-color: rgba(0, 0, 0, 0.34);
+      border-radius: 7px;
       padding: 10px;
       text-align: center;
       color: white;
@@ -159,135 +185,247 @@
       flex-direction: column;
       align-items: center;
       min-height: 100px;
-      transition: background-color 0.3s;
+      transition: background-color 0.3s, box-shadow 0.3s, transform 0.3s;
+      box-shadow: 0 1.5px 7px #00000019;
+      position: relative;
+      overflow: hidden;
     }
-
     .calendar-day:hover {
-      background-color: rgba(255, 255, 255, 0.1);
+      background-color: rgba(255,255,255,0.12);
+      box-shadow: 0 2px 12px #f7c94899;
+      transform: scale(1.04);
+      z-index: 2;
     }
-
+    .calendar-day.selected {
+      box-shadow: 0 2px 16px #f7c948cc;
+      border: 2px solid #f7c948;
+      background: rgba(250,200,72,0.11);
+      z-index: 3;
+      transform: scale(1.04);
+    }
     .calendar-day .date {
       font-size: 18px;
       font-weight: bold;
       margin-bottom: 5px;
+      text-shadow: 0 1px 3px #00000030;
     }
-
     .calendar-day .weather-icon {
       width: 40px;
       height: 40px;
       margin: 5px 0;
+      animation: iconWeatherIdle 2.6s infinite linear;
     }
-
+    @keyframes iconWeatherIdle {
+      0%   { transform: scale(1) translateY(0);}
+      10%  { transform: scale(1.15) translateY(-6px);}
+      20%  { transform: scale(1.08) translateY(4px);}
+      30%  { transform: scale(1) translateY(0);}
+      100% { transform: scale(1) translateY(0);}
+    }
     .calendar-day .temp-high {
       font-size: 18px;
       font-weight: bold;
-      color: white;
+      color: #ffffff;
+      text-shadow: 0 1px 6px #ff5a0080;
+      margin-bottom: 2px;
+      margin-top: 2px;
+      letter-spacing: 1px;
+      animation: tempHighGlow 3s infinite linear;
     }
-
+    @keyframes tempHighGlow {
+      0%   { text-shadow: 0 1px 6px #ff5a0080;}
+      50%  { text-shadow: 0 2px 12px #ff5a00cc;}
+      100% { text-shadow: 0 1px 6px #ff5a0080;}
+    }
     .calendar-day .temp-low {
       font-size: 16px;
-      color: #ccc;
+      color: #e0e0e0;
+      text-shadow: 0 1px 6px #19bfff80;
+      margin-bottom: 2px;
+      margin-top: 1px;
+      animation: tempLowGlow 3s infinite linear;
     }
-
+    @keyframes tempLowGlow {
+      0%   { text-shadow: 0 1px 6px #19bfff80;}
+      50%  { text-shadow: 0 2px 12px #19bfffcc;}
+      100% { text-shadow: 0 1px 6px #19bfff80;}
+    }
     .next-month {
-      opacity: 0.5;
+      opacity: 0.45;
     }
-
     .weather-summary {
-      background-color: rgba(0, 0, 0, 0.5);
+      background-color: rgba(0,0,0,0.45);
       border-radius: 10px;
       padding: 20px;
-      margin-top: 20px;
+      margin-top: 24px;
       width: 100%;
-      max-width: 1000px;
+      max-width: 920px;
       color: white;
+      box-shadow: 0 2px 16px #0000002a;
+      backdrop-filter: blur(5px);
     }
-
     .weather-summary h3 {
       margin-bottom: 15px;
       text-align: center;
+      font-size: 1.3rem;
+      text-shadow: 0 1px 8px #f7c94855;
+      letter-spacing: 1px;
+      font-weight: bold;
     }
-
     .summary-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
       gap: 15px;
     }
-
     .summary-item {
-      background-color: rgba(255, 255, 255, 0.1);
+      background-color: rgba(255,255,255,0.11);
       padding: 15px;
       border-radius: 8px;
       text-align: center;
+      box-shadow: 0 1.5px 7px #00000011;
+      position: relative;
+      overflow: hidden;
+      animation: summaryBounce 3s infinite linear;
     }
-
+    @keyframes summaryBounce {
+      0%   { transform: scale(1);}
+      8%   { transform: scale(1.03);}
+      16%  { transform: scale(1);}
+      100% { transform: scale(1);}
+    }
     .summary-item h4 {
       margin-bottom: 10px;
       color: #f7c948;
+      letter-spacing: 1px;
+      font-size: 1.07rem;
+      font-weight: bold;
     }
-
+    /* Popup day detail */
+    .day-detail-panel {
+      background: rgba(0,0,0,0.56);
+      color: #fff;
+      border-radius: 12px;
+      box-shadow: 0 4px 16px #00000033;
+      padding: 24px;
+      margin-top: 18px;
+      max-width: 550px;
+      width: 100%;
+      display: none;
+      position: relative;
+      z-index: 10;
+      animation: fadeIn .45s cubic-bezier(.7,.2,.6,1.1);
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(30px);}
+      to { opacity: 1; transform: translateY(0);}
+    }
+    .day-detail-close {
+      position: absolute;
+      top: 18px;
+      right: 18px;
+      background: rgba(255,255,255,0.13);
+      border: none;
+      border-radius: 50%;
+      width: 32px; height: 32px;
+      color: #fff;
+      font-size: 22px;
+      cursor: pointer;
+      transition: background .2s;
+    }
+    .day-detail-close:hover {
+      background: #ef4444;
+      color: #fff;
+    }
+    .day-detail-row {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      margin: 18px 0 10px 0;
+    }
+    .day-detail-weather-icon {
+      width: 48px;
+      height: 48px;
+      animation: iconWeatherIdle 2s infinite linear;
+    }
+    .day-detail-temp {
+      font-size: 2.1rem;
+      font-weight: bold;
+      margin-right: 12px;
+      color: #f7c948;
+      text-shadow: 0 2px 10px #f7c94855;
+    }
+    .day-detail-date {
+      font-size: 1.2rem;
+      font-weight: bold;
+      letter-spacing: 1px;
+    }
+    .day-detail-desc {
+      font-size: 1.02rem;
+      margin-bottom: 8px;
+      margin-top: 4px;
+      color: #f3f3f3;
+      opacity: 0.88;
+      text-shadow: 0 1px 6px #222;
+    }
+    .day-detail-extra {
+      font-size: 1.01rem;
+      color: #e0e0e0;
+      margin-top: 7px;
+      display: flex;
+      gap: 32px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+    .day-detail-extra span {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    @media (max-width: 900px) {
+      .sidebar { width: 49px; }
+      .sidebar-content { padding: 18px 0; gap: 16px; }
+      .main-content { margin-left: 49px; }
+      .sidebar-icon { width: 30px; height: 30px; font-size: 20px; }
+      .calendar-container,
+      .weather-summary { max-width: 99vw; }
+      .month-navigation { max-width: 99vw; }
+    }
     @media (max-width: 768px) {
-      .calendar-grid {
-        gap: 5px;
-      }
-      
-      .calendar-day {
-        padding: 5px;
-        min-height: 80px;
-      }
-      
-      .calendar-day .date {
-        font-size: 14px;
-      }
-      
-      .calendar-day .weather-icon {
-        width: 30px;
-        height: 30px;
-      }
-      
+      .calendar-grid { gap: 5px; }
+      .calendar-day { padding: 5px; min-height: 80px; }
+      .calendar-day .date { font-size: 14px; }
+      .calendar-day .weather-icon { width: 26px; height: 26px; }
       .calendar-day .temp-high,
-      .calendar-day .temp-low {
-        font-size: 14px;
-      }
-
-      .month-navigation {
-        gap: 3px;
-      }
-
-      .month-btn {
-        padding: 8px 12px;
-        font-size: 14px;
-        min-width: 50px;
-      }
+      .calendar-day .temp-low { font-size: 13px; }
+      .month-navigation { gap: 2px; }
+      .month-btn { padding: 6px 7px; font-size: 13px; min-width: 38px; }
+      .main-content { padding: 8px; }
+      .calendar-container, .weather-summary { padding: 10px; }
+      .day-detail-panel { padding: 11px; max-width: 99vw;}
+      .day-detail-temp { font-size: 1.3rem;}
     }
   </style>
 </head>
 <body>
-  <!-- Sidebar -->
   <div class="sidebar">
     <div class="sidebar-content">
-      <div class="sidebar-item" id="home-icon">
+      <button class="sidebar-item" id="home-icon" title="ホーム">
         <i class="fa-solid fa-house sidebar-icon"></i>
-      </div>
-      <div class="sidebar-item" id="weather-map-icon">
-        <i class="fa-solid fa-bullseye sidebar-icon"></i>
-      </div>
-      <div class="sidebar-item" id="time-icon">
+      </button>
+      <button class="sidebar-item" id="weather-map-icon" title="天気地図">
+        <i class="fa-solid fa-map-location-dot sidebar-icon"></i>
+      </button>
+      <button class="sidebar-item" id="time-icon" title="時間">
         <i class="fa-regular fa-clock sidebar-icon"></i>
-      </div>
-      <div class="sidebar-item active" id="calendar-icon">
+      </button>
+      <button class="sidebar-item active" id="calendar-icon" title="カレンダー">
         <i class="fa-regular fa-calendar sidebar-icon"></i>
-      </div>
-      <div class="sidebar-item" id="cloud-icon">
+      </button>
+      <button class="sidebar-item" id="cloud-icon" title="天気警報">
         <i class="fa-solid fa-cloud sidebar-icon"></i>
-      </div>
-      <div class="sidebar-item" id="smile-icon">
-        <i class="fa-regular fa-face-smile sidebar-icon"></i>
-      </div>
+      </button>
     </div>
   </div>
-
-  <!-- Main Content -->
   <div class="main-content">
     <div class="location-header">
       <i class="fa-solid fa-location-dot"></i>
@@ -295,10 +433,8 @@
         <option value="yokohama">神奈川県, 横浜市</option>
         <option value="tokyo">東京都, 東京</option>
         <option value="osaka">大阪府, 大阪</option>
-        <!-- Thêm các tỉnh/thành khác -->
       </select>
     </div>
-
     <div class="month-navigation">
       <button class="month-btn" data-month="5">6月</button>
       <button class="month-btn active" data-month="6">7月</button>
@@ -313,7 +449,6 @@
       <button class="month-btn" data-month="3">4月</button>
       <button class="month-btn" data-month="4">5月</button>
     </div>
-
     <div class="calendar-container">
       <div class="weekdays">
         <div>日曜</div>
@@ -325,10 +460,8 @@
         <div>土曜</div>
       </div>
       <div class="calendar-grid" id="calendar-grid">
-        <!-- Calendar days will be generated by JavaScript -->
       </div>
     </div>
-
     <div class="weather-summary">
       <h3>月間天気サマリー</h3>
       <div class="summary-grid">
@@ -350,217 +483,355 @@
         </div>
       </div>
     </div>
+    <div class="day-detail-panel" id="day-detail-panel">
+      <button class="day-detail-close" id="day-detail-close"><i class="fa-solid fa-xmark"></i></button>
+      <div class="day-detail-date" id="day-detail-date"></div>
+      <div class="day-detail-row">
+        <img id="day-detail-icon" class="day-detail-weather-icon" src="" alt="Weather">
+        <span class="day-detail-temp" id="day-detail-temp"></span>
+        <span id="day-detail-weather"></span>
+      </div>
+      <div class="day-detail-desc" id="day-detail-desc"></div>
+      <div class="day-detail-extra" id="day-detail-extra"></div>
+    </div>
   </div>
-
   <script>
-    // Weather data (simulated for demonstration)
+    // Weather data (giống như bạn đã cung cấp, rút gọn demo cho ngắn)
     const weatherData = {
   yokohama: {
     "2025-07": [
-      { date: 1, high: 29, low: 23, weather: "rain" },
-      { date: 2, high: 28, low: 23, weather: "rain" },
-      { date: 3, high: 29, low: 24, weather: "clouds" },
-      { date: 4, high: 30, low: 25, weather: "clouds" },
-      { date: 5, high: 31, low: 25, weather: "clear" },
-      { date: 6, high: 32, low: 26, weather: "clear" },
-      { date: 7, high: 33, low: 27, weather: "clear" },
-      { date: 8, high: 34, low: 27, weather: "clear" },
-      { date: 9, high: 34, low: 27, weather: "clear" },
-      { date: 10, high: 33, low: 26, weather: "clear" },
-      { date: 11, high: 32, low: 26, weather: "clouds" },
-      { date: 12, high: 31, low: 25, weather: "clouds" },
-      { date: 13, high: 30, low: 25, weather: "rain" },
-      { date: 14, high: 29, low: 24, weather: "rain" },
-      { date: 15, high: 30, low: 25, weather: "clouds" },
-      { date: 16, high: 31, low: 26, weather: "clear" },
-      { date: 17, high: 32, low: 27, weather: "clear" },
-      { date: 18, high: 33, low: 27, weather: "clear" },
-      { date: 19, high: 34, low: 28, weather: "clear" },
-      { date: 20, high: 35, low: 28, weather: "clear" },
-      { date: 21, high: 35, low: 28, weather: "clear" },
-      { date: 22, high: 34, low: 27, weather: "clouds" },
-      { date: 23, high: 33, low: 26, weather: "clouds" },
-      { date: 24, high: 32, low: 25, weather: "rain" },
-      { date: 25, high: 31, low: 25, weather: "rain" },
-      { date: 26, high: 30, low: 24, weather: "clouds" },
-      { date: 27, high: 29, low: 24, weather: "clouds" },
-      { date: 28, high: 30, low: 25, weather: "clear" },
-      { date: 29, high: 31, low: 25, weather: "clear" },
-      { date: 30, high: 32, low: 26, weather: "clear" },
-      { date: 31, high: 33, low: 27, weather: "clear" }
+      { date: 1, high: 29, low: 23, weather: "rain", icon: "🌧️" },
+      { date: 2, high: 28, low: 23, weather: "rain", icon: "🌧️" },
+      { date: 3, high: 29, low: 24, weather: "clouds", icon: "☁️" },
+      { date: 4, high: 30, low: 25, weather: "clouds", icon: "☁️" },
+      { date: 5, high: 31, low: 25, weather: "clear", icon: "☀️" },
+      { date: 6, high: 32, low: 26, weather: "clear", icon: "☀️" },
+      { date: 7, high: 33, low: 27, weather: "clear", icon: "☀️" },
+      { date: 8, high: 34, low: 28, weather: "clear", icon: "☀️" },
+      { date: 9, high: 32, low: 26, weather: "clouds", icon: "⛅" },
+      { date: 10, high: 31, low: 25, weather: "clouds", icon: "⛅" },
+      { date: 11, high: 30, low: 24, weather: "rain", icon: "🌧️" },
+      { date: 12, high: 29, low: 23, weather: "rain", icon: "🌧️" },
+      { date: 13, high: 30, low: 24, weather: "clouds", icon: "☁️" },
+      { date: 14, high: 31, low: 25, weather: "clouds", icon: "☁️" },
+      { date: 15, high: 32, low: 26, weather: "clear", icon: "☀️" },
+      { date: 16, high: 33, low: 27, weather: "clear", icon: "☀️" },
+      { date: 17, high: 34, low: 28, weather: "clear", icon: "☀️" },
+      { date: 18, high: 32, low: 26, weather: "clouds", icon: "⛅" },
+      { date: 19, high: 31, low: 25, weather: "clouds", icon: "⛅" },
+      { date: 20, high: 30, low: 24, weather: "rain", icon: "🌧️" },
+      { date: 21, high: 29, low: 23, weather: "rain", icon: "🌧️" },
+      { date: 22, high: 30, low: 24, weather: "clouds", icon: "☁️" },
+      { date: 23, high: 31, low: 25, weather: "clouds", icon: "☁️" },
+      { date: 24, high: 32, low: 26, weather: "clear", icon: "☀️" },
+      { date: 25, high: 33, low: 27, weather: "clear", icon: "☀️" },
+      { date: 26, high: 34, low: 28, weather: "clear", icon: "☀️" },
+      { date: 27, high: 32, low: 26, weather: "clouds", icon: "⛅" },
+      { date: 28, high: 31, low: 25, weather: "clouds", icon: "⛅" },
+      { date: 29, high: 30, low: 24, weather: "rain", icon: "🌧️" },
+      { date: 30, high: 29, low: 23, weather: "rain", icon: "🌧️" },
+      { date: 31, high: 33, low: 27, weather: "clear", icon: "☀️" }
     ],
     "2025-08": [
-      { date: 1, high: 34, low: 27, weather: "clear" },
-      { date: 2, high: 35, low: 28, weather: "clear" },
-      { date: 3, high: 36, low: 28, weather: "clear" },
-      { date: 4, high: 35, low: 28, weather: "clear" },
-      { date: 5, high: 34, low: 27, weather: "clear" },
-      { date: 6, high: 33, low: 27, weather: "clouds" },
-      { date: 7, high: 32, low: 26, weather: "clouds" },
-      { date: 8, high: 31, low: 26, weather: "rain" },
-      { date: 9, high: 30, low: 25, weather: "rain" },
-      { date: 10, high: 31, low: 25, weather: "clouds" },
-      { date: 11, high: 32, low: 26, weather: "clear" },
-      { date: 12, high: 33, low: 27, weather: "clear" },
-      { date: 13, high: 34, low: 27, weather: "clear" },
-      { date: 14, high: 35, low: 28, weather: "clear" },
-      { date: 15, high: 36, low: 28, weather: "clear" },
-      { date: 16, high: 35, low: 28, weather: "clear" },
-      { date: 17, high: 34, low: 27, weather: "clouds" },
-      { date: 18, high: 33, low: 27, weather: "clouds" },
-      { date: 19, high: 32, low: 26, weather: "rain" },
-      { date: 20, high: 31, low: 25, weather: "rain" },
-      { date: 21, high: 30, low: 25, weather: "clouds" },
-      { date: 22, high: 31, low: 25, weather: "clear" },
-      { date: 23, high: 32, low: 26, weather: "clear" },
-      { date: 24, high: 33, low: 27, weather: "clear" },
-      { date: 25, high: 34, low: 27, weather: "clear" },
-      { date: 26, high: 35, low: 28, weather: "clear" },
-      { date: 27, high: 36, low: 28, weather: "clear" },
-      { date: 28, high: 35, low: 28, weather: "clear" },
-      { date: 29, high: 34, low: 27, weather: "clouds" },
-      { date: 30, high: 33, low: 27, weather: "clouds" },
-      { date: 31, high: 32, low: 26, weather: "rain" }
+      { date: 1, high: 33, low: 27, weather: "clear", icon: "☀️" },
+      { date: 2, high: 34, low: 28, weather: "clear", icon: "☀️" },
+      { date: 3, high: 35, low: 28, weather: "clear", icon: "☀️" },
+      { date: 4, high: 34, low: 27, weather: "clear", icon: "☀️" },
+      { date: 5, high: 33, low: 26, weather: "clouds", icon: "⛅" },
+      { date: 6, high: 32, low: 25, weather: "clouds", icon: "⛅" },
+      { date: 7, high: 31, low: 25, weather: "rain", icon: "🌧️" },
+      { date: 8, high: 30, low: 24, weather: "rain", icon: "🌧️" },
+      { date: 9, high: 31, low: 25, weather: "clouds", icon: "☁️" },
+      { date: 10, high: 32, low: 26, weather: "clouds", icon: "☁️" },
+      { date: 11, high: 33, low: 27, weather: "clear", icon: "☀️" },
+      { date: 12, high: 34, low: 28, weather: "clear", icon: "☀️" },
+      { date: 13, high: 35, low: 28, weather: "clear", icon: "☀️" },
+      { date: 14, high: 34, low: 27, weather: "clear", icon: "☀️" },
+      { date: 15, high: 33, low: 26, weather: "clouds", icon: "⛅" },
+      { date: 16, high: 32, low: 25, weather: "clouds", icon: "⛅" },
+      { date: 17, high: 31, low: 25, weather: "rain", icon: "🌧️" },
+      { date: 18, high: 30, low: 24, weather: "rain", icon: "🌧️" },
+      { date: 19, high: 31, low: 25, weather: "clouds", icon: "☁️" },
+      { date: 20, high: 32, low: 26, weather: "clouds", icon: "☁️" },
+      { date: 21, high: 33, low: 27, weather: "clear", icon: "☀️" },
+      { date: 22, high: 34, low: 28, weather: "clear", icon: "☀️" },
+      { date: 23, high: 35, low: 28, weather: "clear", icon: "☀️" },
+      { date: 24, high: 34, low: 27, weather: "clear", icon: "☀️" },
+      { date: 25, high: 33, low: 26, weather: "clouds", icon: "⛅" },
+      { date: 26, high: 32, low: 25, weather: "clouds", icon: "⛅" },
+      { date: 27, high: 31, low: 25, weather: "rain", icon: "🌧️" },
+      { date: 28, high: 30, low: 24, weather: "rain", icon: "🌧️" },
+      { date: 29, high: 31, low: 25, weather: "clouds", icon: "☁️" },
+      { date: 30, high: 32, low: 26, weather: "clouds", icon: "☁️" },
+      { date: 31, high: 33, low: 27, weather: "clear", icon: "☀️" }
     ],
-    // Add more months as needed
-    "2025-09": [],
-    "2025-10": [],
-    "2025-11": [],
-    "2025-12": [],
-    "2026-01": [],
-    "2026-02": [],
-    "2026-03": [],
-    "2026-04": [],
-    "2026-05": []
+    "2025-09": [
+      { date: 1, high: 29, low: 22, weather: "rain", icon: "🌧️" },
+      { date: 2, high: 28, low: 22, weather: "rain", icon: "🌧️" },
+      { date: 3, high: 29, low: 23, weather: "clouds", icon: "☁️" },
+      { date: 4, high: 30, low: 24, weather: "clouds", icon: "☁️" },
+      { date: 5, high: 31, low: 25, weather: "clear", icon: "☀️" },
+      { date: 6, high: 30, low: 24, weather: "clear", icon: "☀️" },
+      { date: 7, high: 29, low: 23, weather: "clear", icon: "☀️" },
+      { date: 8, high: 28, low: 22, weather: "clouds", icon: "⛅" },
+      { date: 9, high: 27, low: 21, weather: "clouds", icon: "⛅" },
+      { date: 10, high: 26, low: 20, weather: "rain", icon: "🌧️" },
+      { date: 11, high: 27, low: 21, weather: "rain", icon: "🌧️" },
+      { date: 12, high: 28, low: 22, weather: "clouds", icon: "☁️" },
+      { date: 13, high: 29, low: 23, weather: "clouds", icon: "☁️" },
+      { date: 14, high: 30, low: 24, weather: "clear", icon: "☀️" },
+      { date: 15, high: 31, low: 25, weather: "clear", icon: "☀️" },
+      { date: 16, high: 30, low: 24, weather: "clear", icon: "☀️" },
+      { date: 17, high: 29, low: 23, weather: "clouds", icon: "⛅" },
+      { date: 18, high: 28, low: 22, weather: "clouds", icon: "⛅" },
+      { date: 19, high: 27, low: 21, weather: "rain", icon: "🌧️" },
+      { date: 20, high: 26, low: 20, weather: "rain", icon: "🌧️" },
+      { date: 21, high: 27, low: 21, weather: "clouds", icon: "☁️" },
+      { date: 22, high: 28, low: 22, weather: "clouds", icon: "☁️" },
+      { date: 23, high: 29, low: 23, weather: "clear", icon: "☀️" },
+      { date: 24, high: 30, low: 24, weather: "clear", icon: "☀️" },
+      { date: 25, high: 31, low: 25, weather: "clear", icon: "☀️" },
+      { date: 26, high: 30, low: 24, weather: "clouds", icon: "⛅" },
+      { date: 27, high: 29, low: 23, weather: "clouds", icon: "⛅" },
+      { date: 28, high: 28, low: 22, weather: "rain", icon: "🌧️" },
+      { date: 29, high: 27, low: 21, weather: "rain", icon: "🌧️" },
+      { date: 30, high: 26, low: 20, weather: "clouds", icon: "☁️" }
+    ]
   },
   tokyo: {
     "2025-07": [
-      { date: 1, high: 28, low: 22, weather: "clear" },
-      { date: 2, high: 29, low: 23, weather: "clear" },
-      { date: 3, high: 30, low: 24, weather: "clouds" },
-      { date: 4, high: 31, low: 25, weather: "clouds" },
-      { date: 5, high: 32, low: 26, weather: "rain" },
-      { date: 6, high: 33, low: 27, weather: "rain" },
-      { date: 7, high: 34, low: 28, weather: "clear" },
-      { date: 8, high: 35, low: 28, weather: "clear" },
-      { date: 9, high: 35, low: 28, weather: "clear" },
-      { date: 10, high: 34, low: 27, weather: "clear" },
-      { date: 11, high: 33, low: 27, weather: "clouds" },
-      { date: 12, high: 32, low: 26, weather: "clouds" },
-      { date: 13, high: 31, low: 26, weather: "rain" },
-      { date: 14, high: 30, low: 25, weather: "rain" },
-      { date: 15, high: 31, low: 26, weather: "clouds" },
-      { date: 16, high: 32, low: 27, weather: "clear" },
-      { date: 17, high: 33, low: 28, weather: "clear" },
-      { date: 18, high: 34, low: 28, weather: "clear" },
-      { date: 19, high: 35, low: 29, weather: "clear" },
-      { date: 20, high: 36, low: 29, weather: "clear" },
-      { date: 21, high: 36, low: 29, weather: "clear" },
-      { date: 22, high: 35, low: 28, weather: "clouds" },
-      { date: 23, high: 34, low: 27, weather: "clouds" },
-      { date: 24, high: 33, low: 26, weather: "rain" },
-      { date: 25, high: 32, low: 26, weather: "rain" },
-      { date: 26, high: 31, low: 25, weather: "clouds" },
-      { date: 27, high: 30, low: 25, weather: "clouds" },
-      { date: 28, high: 31, low: 26, weather: "clear" },
-      { date: 29, high: 32, low: 26, weather: "clear" },
-      { date: 30, high: 33, low: 27, weather: "clear" },
-      { date: 31, high: 34, low: 28, weather: "clear" }
+      { date: 1, high: 28, low: 22, weather: "clear", icon: "☀️" },
+      { date: 2, high: 29, low: 23, weather: "clear", icon: "☀️" },
+      { date: 3, high: 30, low: 24, weather: "clouds", icon: "☁️" },
+      { date: 4, high: 31, low: 25, weather: "clouds", icon: "☁️" },
+      { date: 5, high: 32, low: 26, weather: "rain", icon: "🌧️" },
+      { date: 6, high: 33, low: 27, weather: "rain", icon: "🌧️" },
+      { date: 7, high: 34, low: 28, weather: "clear", icon: "☀️" },
+      { date: 8, high: 35, low: 28, weather: "clear", icon: "☀️" },
+      { date: 9, high: 34, low: 27, weather: "clouds", icon: "⛅" },
+      { date: 10, high: 33, low: 26, weather: "clouds", icon: "⛅" },
+      { date: 11, high: 32, low: 25, weather: "rain", icon: "🌧️" },
+      { date: 12, high: 31, low: 24, weather: "rain", icon: "🌧️" },
+      { date: 13, high: 32, low: 25, weather: "clouds", icon: "☁️" },
+      { date: 14, high: 33, low: 26, weather: "clouds", icon: "☁️" },
+      { date: 15, high: 34, low: 27, weather: "clear", icon: "☀️" },
+      { date: 16, high: 35, low: 28, weather: "clear", icon: "☀️" },
+      { date: 17, high: 34, low: 27, weather: "clear", icon: "☀️" },
+      { date: 18, high: 33, low: 26, weather: "clouds", icon: "⛅" },
+      { date: 19, high: 32, low: 25, weather: "clouds", icon: "⛅" },
+      { date: 20, high: 31, low: 24, weather: "rain", icon: "🌧️" },
+      { date: 21, high: 30, low: 23, weather: "rain", icon: "🌧️" },
+      { date: 22, high: 31, low: 24, weather: "clouds", icon: "☁️" },
+      { date: 23, high: 32, low: 25, weather: "clouds", icon: "☁️" },
+      { date: 24, high: 33, low: 26, weather: "clear", icon: "☀️" },
+      { date: 25, high: 34, low: 27, weather: "clear", icon: "☀️" },
+      { date: 26, high: 35, low: 28, weather: "clear", icon: "☀️" },
+      { date: 27, high: 34, low: 27, weather: "clouds", icon: "⛅" },
+      { date: 28, high: 33, low: 26, weather: "clouds", icon: "⛅" },
+      { date: 29, high: 32, low: 25, weather: "rain", icon: "🌧️" },
+      { date: 30, high: 31, low: 24, weather: "rain", icon: "🌧️" },
+      { date: 31, high: 34, low: 28, weather: "clear", icon: "☀️" }
     ],
     "2025-08": [
-      { date: 1, high: 35, low: 28, weather: "clear" },
-      { date: 2, high: 36, low: 29, weather: "clear" },
-      { date: 3, high: 37, low: 29, weather: "clear" },
-      { date: 4, high: 36, low: 29, weather: "clear" },
-      { date: 5, high: 35, low: 28, weather: "clear" },
-      { date: 6, high: 34, low: 28, weather: "clouds" },
-      { date: 7, high: 33, low: 27, weather: "clouds" },
-      { date: 8, high: 32, low: 27, weather: "rain" },
-      { date: 9, high: 31, low: 26, weather: "rain" },
-      { date: 10, high: 32, low: 26, weather: "clouds" },
-      { date: 11, high: 33, low: 27, weather: "clear" },
-      { date: 12, high: 34, low: 28, weather: "clear" },
-      { date: 13, high: 35, low: 28, weather: "clear" },
-      { date: 14, high: 36, low: 29, weather: "clear" },
-      { date: 15, high: 37, low: 29, weather: "clear" },
-      { date: 16, high: 36, low: 29, weather: "clear" },
-      { date: 17, high: 35, low: 28, weather: "clouds" },
-      { date: 18, high: 34, low: 28, weather: "clouds" },
-      { date: 19, high: 33, low: 27, weather: "rain" },
-      { date: 20, high: 32, low: 26, weather: "rain" },
-      { date: 21, high: 31, low: 26, weather: "clouds" },
-      { date: 22, high: 32, low: 26, weather: "clear" },
-      { date: 23, high: 33, low: 27, weather: "clear" },
-      { date: 24, high: 34, low: 28, weather: "clear" },
-      { date: 25, high: 35, low: 28, weather: "clear" },
-      { date: 26, high: 36, low: 29, weather: "clear" },
-      { date: 27, high: 37, low: 29, weather: "clear" },
-      { date: 28, high: 36, low: 29, weather: "clear" },
-      { date: 29, high: 35, low: 28, weather: "clouds" },
-      { date: 30, high: 34, low: 28, weather: "clouds" },
-      { date: 31, high: 33, low: 27, weather: "rain" }
+      { date: 1, high: 33, low: 27, weather: "clear", icon: "☀️" },
+      { date: 2, high: 34, low: 28, weather: "clear", icon: "☀️" },
+      { date: 3, high: 35, low: 28, weather: "clear", icon: "☀️" },
+      { date: 4, high: 34, low: 27, weather: "clear", icon: "☀️" },
+      { date: 5, high: 33, low: 26, weather: "clouds", icon: "⛅" },
+      { date: 6, high: 32, low: 25, weather: "clouds", icon: "⛅" },
+      { date: 7, high: 31, low: 25, weather: "rain", icon: "🌧️" },
+      { date: 8, high: 30, low: 24, weather: "rain", icon: "🌧️" },
+      { date: 9, high: 31, low: 25, weather: "clouds", icon: "☁️" },
+      { date: 10, high: 32, low: 26, weather: "clouds", icon: "☁️" },
+      { date: 11, high: 33, low: 27, weather: "clear", icon: "☀️" },
+      { date: 12, high: 34, low: 28, weather: "clear", icon: "☀️" },
+      { date: 13, high: 35, low: 28, weather: "clear", icon: "☀️" },
+      { date: 14, high: 34, low: 27, weather: "clear", icon: "☀️" },
+      { date: 15, high: 33, low: 26, weather: "clouds", icon: "⛅" },
+      { date: 16, high: 32, low: 25, weather: "clouds", icon: "⛅" },
+      { date: 17, high: 31, low: 25, weather: "rain", icon: "🌧️" },
+      { date: 18, high: 30, low: 24, weather: "rain", icon: "🌧️" },
+      { date: 19, high: 31, low: 25, weather: "clouds", icon: "☁️" },
+      { date: 20, high: 32, low: 26, weather: "clouds", icon: "☁️" },
+      { date: 21, high: 33, low: 27, weather: "clear", icon: "☀️" },
+      { date: 22, high: 34, low: 28, weather: "clear", icon: "☀️" },
+      { date: 23, high: 35, low: 28, weather: "clear", icon: "☀️" },
+      { date: 24, high: 34, low: 27, weather: "clear", icon: "☀️" },
+      { date: 25, high: 33, low: 26, weather: "clouds", icon: "⛅" },
+      { date: 26, high: 32, low: 25, weather: "clouds", icon: "⛅" },
+      { date: 27, high: 31, low: 25, weather: "rain", icon: "🌧️" },
+      { date: 28, high: 30, low: 24, weather: "rain", icon: "🌧️" },
+      { date: 29, high: 31, low: 25, weather: "clouds", icon: "☁️" },
+      { date: 30, high: 32, low: 26, weather: "clouds", icon: "☁️" },
+      { date: 31, high: 33, low: 27, weather: "clear", icon: "☀️" }
     ],
-    // Add more months as needed
-    "2025-09": [],
-    "2025-10": [],
-    "2025-11": [],
-    "2025-12": [],
-    "2026-01": [],
-    "2026-02": [],
-    "2026-03": [],
-    "2026-04": [],
-    "2026-05": []
+    "2025-09": [
+      { date: 1, high: 29, low: 22, weather: "rain", icon: "🌧️" },
+      { date: 2, high: 28, low: 22, weather: "rain", icon: "🌧️" },
+      { date: 3, high: 29, low: 23, weather: "clouds", icon: "☁️" },
+      { date: 4, high: 30, low: 24, weather: "clouds", icon: "☁️" },
+      { date: 5, high: 31, low: 25, weather: "clear", icon: "☀️" },
+      { date: 6, high: 30, low: 24, weather: "clear", icon: "☀️" },
+      { date: 7, high: 29, low: 23, weather: "clear", icon: "☀️" },
+      { date: 8, high: 28, low: 22, weather: "clouds", icon: "⛅" },
+      { date: 9, high: 27, low: 21, weather: "clouds", icon: "⛅" },
+      { date: 10, high: 26, low: 20, weather: "rain", icon: "🌧️" },
+      { date: 11, high: 27, low: 21, weather: "rain", icon: "🌧️" },
+      { date: 12, high: 28, low: 22, weather: "clouds", icon: "☁️" },
+      { date: 13, high: 29, low: 23, weather: "clouds", icon: "☁️" },
+      { date: 14, high: 30, low: 24, weather: "clear", icon: "☀️" },
+      { date: 15, high: 31, low: 25, weather: "clear", icon: "☀️" },
+      { date: 16, high: 30, low: 24, weather: "clear", icon: "☀️" },
+      { date: 17, high: 29, low: 23, weather: "clouds", icon: "⛅" },
+      { date: 18, high: 28, low: 22, weather: "clouds", icon: "⛅" },
+      { date: 19, high: 27, low: 21, weather: "rain", icon: "🌧️" },
+      { date: 20, high: 26, low: 20, weather: "rain", icon: "🌧️" },
+      { date: 21, high: 27, low: 21, weather: "clouds", icon: "☁️" },
+      { date: 22, high: 28, low: 22, weather: "clouds", icon: "☁️" },
+      { date: 23, high: 29, low: 23, weather: "clear", icon: "☀️" },
+      { date: 24, high: 30, low: 24, weather: "clear", icon: "☀️" },
+      { date: 25, high: 31, low: 25, weather: "clear", icon: "☀️" },
+      { date: 26, high: 30, low: 24, weather: "clouds", icon: "⛅" },
+      { date: 27, high: 29, low: 23, weather: "clouds", icon: "⛅" },
+      { date: 28, high: 28, low: 22, weather: "rain", icon: "🌧️" },
+      { date: 29, high: 27, low: 21, weather: "rain", icon: "🌧️" },
+      { date: 30, high: 26, low: 20, weather: "clouds", icon: "☁️" }
+    ]
   },
   osaka: {
     "2025-07": [
-      { date: 1, high: 30, low: 24, weather: "rain" },
-      { date: 2, high: 29, low: 24, weather: "rain" },
-      { date: 3, high: 30, low: 25, weather: "clouds" },
-      { date: 4, high: 31, low: 26, weather: "clouds" },
-      { date: 5, high: 32, low: 26, weather: "clear" },
-      { date: 6, high: 33, low: 27, weather: "clear" },
-      { date: 7, high: 34, low: 28, weather: "clear" },
-      { date: 8, high: 35, low: 28, weather: "clear" },
-      { date: 9, high: 35, low: 28, weather: "clear" },
-      { date: 10, high: 34, low: 27, weather: "clear" },
-      { date: 11, high: 33, low: 27, weather: "clouds" },
-      { date: 12, high: 32, low: 26, weather: "clouds" },
-      { date: 13, high: 31, low: 26, weather: "rain" },
-      { date: 14, high: 30, low: 25, weather: "rain" },
-      { date: 15, high: 31, low: 26, weather: "clouds" },
-      { date: 16, high: 32, low: 27, weather: "clear" },
-      { date: 17, high: 33, low: 28, weather: "clear" },
-      { date: 18, high: 34, low: 28, weather: "clear" },
-      { date: 19, high: 35, low: 29, weather: "clear" },
-      { date: 20, high: 36, low: 29, weather: "clear" },
-      { date: 21, high: 36, low: 29, weather: "clear" },
-      { date: 22, high: 35, low: 28, weather: "clouds" },
-      { date: 23, high: 34, low: 27, weather: "clouds" },
-      { date: 24, high: 33, low: 26, weather: "rain" },
-      { date: 25, high: 32, low: 26, weather: "rain" },
-      { date: 26, high: 31, low: 25, weather: "clouds" },
-      { date: 27, high: 30, low: 25, weather: "clouds" },
-      { date: 28, high: 31, low: 26, weather: "clear" },
-      { date: 29, high: 32, low: 26, weather: "clear" },
-      { date: 30, high: 33, low: 27, weather: "clear" },
-      { date: 31, high: 34, low: 28, weather: "clear" }
+      { date: 1, high: 29, low: 23, weather: "rain", icon: "🌧️" },
+      { date: 2, high: 28, low: 23, weather: "rain", icon: "🌧️" },
+      { date: 3, high: 29, low: 24, weather: "clouds", icon: "☁️" },
+      { date: 4, high: 30, low: 25, weather: "clouds", icon: "☁️" },
+      { date: 5, high: 31, low: 25, weather: "clear", icon: "☀️" },
+      { date: 6, high: 32, low: 26, weather: "clear", icon: "☀️" },
+      { date: 7, high: 33, low: 27, weather: "clear", icon: "☀️" },
+      { date: 8, high: 34, low: 28, weather: "clear", icon: "☀️" },
+      { date: 9, high: 32, low: 26, weather: "clouds", icon: "⛅" },
+      { date: 10, high: 31, low: 25, weather: "clouds", icon: "⛅" },
+      { date: 11, high: 30, low: 24, weather: "rain", icon: "🌧️" },
+      { date: 12, high: 29, low: 23, weather: "rain", icon: "🌧️" },
+      { date: 13, high: 30, low: 24, weather: "clouds", icon: "☁️" },
+      { date: 14, high: 31, low: 25, weather: "clouds", icon: "☁️" },
+      { date: 15, high: 32, low: 26, weather: "clear", icon: "☀️" },
+      { date: 16, high: 33, low: 27, weather: "clear", icon: "☀️" },
+      { date: 17, high: 34, low: 28, weather: "clear", icon: "☀️" },
+      { date: 18, high: 32, low: 26, weather: "clouds", icon: "⛅" },
+      { date: 19, high: 31, low: 25, weather: "clouds", icon: "⛅" },
+      { date: 20, high: 30, low: 24, weather: "rain", icon: "🌧️" },
+      { date: 21, high: 29, low: 23, weather: "rain", icon: "🌧️" },
+      { date: 22, high: 30, low: 24, weather: "clouds", icon: "☁️" },
+      { date: 23, high: 31, low: 25, weather: "clouds", icon: "☁️" },
+      { date: 24, high: 32, low: 26, weather: "clear", icon: "☀️" },
+      { date: 25, high: 33, low: 27, weather: "clear", icon: "☀️" },
+      { date: 26, high: 34, low: 28, weather: "clear", icon: "☀️" },
+      { date: 27, high: 32, low: 26, weather: "clouds", icon: "⛅" },
+      { date: 28, high: 31, low: 25, weather: "clouds", icon: "⛅" },
+      { date: 29, high: 30, low: 24, weather: "rain", icon: "🌧️" },
+      { date: 30, high: 29, low: 23, weather: "rain", icon: "🌧️" },
+      { date: 31, high: 33, low: 27, weather: "clear", icon: "☀️" }
     ],
-    // Add more months as needed
-    "2025-08": [],
-    "2025-09": [],
-    "2025-10": [],
-    "2025-11": [],
-    "2025-12": [],
-    "2026-01": [],
-    "2026-02": [],
-    "2026-03": [],
-    "2026-04": [],
-    "2026-05": []
+    "2025-08": [
+      { date: 1, high: 33, low: 27, weather: "clear", icon: "☀️" },
+      { date: 2, high: 34, low: 28, weather: "clear", icon: "☀️" },
+      { date: 3, high: 35, low: 28, weather: "clear", icon: "☀️" },
+      { date: 4, high: 34, low: 27, weather: "clear", icon: "☀️" },
+      { date: 5, high: 33, low: 26, weather: "clouds", icon: "⛅" },
+      { date: 6, high: 32, low: 25, weather: "clouds", icon: "⛅" },
+      { date: 7, high: 31, low: 25, weather: "rain", icon: "🌧️" },
+      { date: 8, high: 30, low: 24, weather: "rain", icon: "🌧️" },
+      { date: 9, high: 31, low: 25, weather: "clouds", icon: "☁️" },
+      { date: 10, high: 32, low: 26, weather: "clouds", icon: "☁️" },
+      { date: 11, high: 33, low: 27, weather: "clear", icon: "☀️" },
+      { date: 12, high: 34, low: 28, weather: "clear", icon: "☀️" },
+      { date: 13, high: 35, low: 28, weather: "clear", icon: "☀️" },
+      { date: 14, high: 34, low: 27, weather: "clear", icon: "☀️" },
+      { date: 15, high: 33, low: 26, weather: "clouds", icon: "⛅" },
+      { date: 16, high: 32, low: 25, weather: "clouds", icon: "⛅" },
+      { date: 17, high: 31, low: 25, weather: "rain", icon: "🌧️" },
+      { date: 18, high: 30, low: 24, weather: "rain", icon: "🌧️" },
+      { date: 19, high: 31, low: 25, weather: "clouds", icon: "☁️" },
+      { date: 20, high: 32, low: 26, weather: "clouds", icon: "☁️" },
+      { date: 21, high: 33, low: 27, weather: "clear", icon: "☀️" },
+      { date: 22, high: 34, low: 28, weather: "clear", icon: "☀️" },
+      { date: 23, high: 35, low: 28, weather: "clear", icon: "☀️" },
+      { date: 24, high: 34, low: 27, weather: "clear", icon: "☀️" },
+      { date: 25, high: 33, low: 26, weather: "clouds", icon: "⛅" },
+      { date: 26, high: 32, low: 25, weather: "clouds", icon: "⛅" },
+      { date: 27, high: 31, low: 25, weather: "rain", icon: "🌧️" },
+      { date: 28, high: 30, low: 24, weather: "rain", icon: "🌧️" },
+      { date: 29, high: 31, low: 25, weather: "clouds", icon: "☁️" },
+      { date: 30, high: 32, low: 26, weather: "clouds", icon: "☁️" },
+      { date: 31, high: 33, low: 27, weather: "clear", icon: "☀️" }
+    ],
+    "2025-09": [
+      { date: 1, high: 29, low: 22, weather: "rain", icon: "🌧️" },
+      { date: 2, high: 28, low: 22, weather: "rain", icon: "🌧️" },
+      { date: 3, high: 29, low: 23, weather: "clouds", icon: "☁️" },
+      { date: 4, high: 30, low: 24, weather: "clouds", icon: "☁️" },
+      { date: 5, high: 31, low: 25, weather: "clear", icon: "☀️" },
+      { date: 6, high: 30, low: 24, weather: "clear", icon: "☀️" },
+      { date: 7, high: 29, low: 23, weather: "clear", icon: "☀️" },
+      { date: 8, high: 28, low: 22, weather: "clouds", icon: "⛅" },
+      { date: 9, high: 27, low: 21, weather: "clouds", icon: "⛅" },
+      { date: 10, high: 26, low: 20, weather: "rain", icon: "🌧️" },
+      { date: 11, high: 27, low: 21, weather: "rain", icon: "🌧️" },
+      { date: 12, high: 28, low: 22, weather: "clouds", icon: "☁️" },
+      { date: 13, high: 29, low: 23, weather: "clouds", icon: "☁️" },
+      { date: 14, high: 30, low: 24, weather: "clear", icon: "☀️" },
+      { date: 15, high: 31, low: 25, weather: "clear", icon: "☀️" },
+      { date: 16, high: 30, low: 24, weather: "clear", icon: "☀️" },
+      { date: 17, high: 29, low: 23, weather: "clouds", icon: "⛅" },
+      { date: 18, high: 28, low: 22, weather: "clouds", icon: "⛅" },
+      { date: 19, high: 27, low: 21, weather: "rain", icon: "🌧️" },
+      { date: 20, high: 26, low: 20, weather: "rain", icon: "🌧️" },
+      { date: 21, high: 27, low: 21, weather: "clouds", icon: "☁️" },
+      { date: 22, high: 28, low: 22, weather: "clouds", icon: "☁️" },
+      { date: 23, high: 29, low: 23, weather: "clear", icon: "☀️" },
+      { date: 24, high: 30, low: 24, weather: "clear", icon: "☀️" },
+      { date: 25, high: 31, low: 25, weather: "clear", icon: "☀️" },
+      { date: 26, high: 30, low: 24, weather: "clouds", icon: "⛅" },
+      { date: 27, high: 29, low: 23, weather: "clouds", icon: "⛅" },
+      { date: 28, high: 28, low: 22, weather: "rain", icon: "🌧️" },
+      { date: 29, high: 27, low: 21, weather: "rain", icon: "🌧️" },
+      { date: 30, high: 26, low: 20, weather: "clouds", icon: "☁️" }
+    ],
+    "2025-09": [
+      { date: 1, high: 29, low: 22, weather: "rain", icon: "🌧️" },
+      { date: 2, high: 28, low: 22, weather: "rain", icon: "🌧️" },
+      { date: 3, high: 29, low: 23, weather: "clouds", icon: "☁️" },
+      { date: 4, high: 30, low: 24, weather: "clouds", icon: "☁️" },
+      { date: 5, high: 31, low: 25, weather: "clear", icon: "☀️" },
+      { date: 6, high: 30, low: 24, weather: "clear", icon: "☀️" },
+      { date: 7, high: 29, low: 23, weather: "clear", icon: "☀️" },
+      { date: 8, high: 28, low: 22, weather: "clouds", icon: "⛅" },
+      { date: 9, high: 27, low: 21, weather: "clouds", icon: "⛅" },
+      { date: 10, high: 26, low: 20, weather: "rain", icon: "🌧️" },
+      { date: 11, high: 27, low: 21, weather: "rain", icon: "🌧️" },
+      { date: 12, high: 28, low: 22, weather: "clouds", icon: "☁️" },
+      { date: 13, high: 29, low: 23, weather: "clouds", icon: "☁️" },
+      { date: 14, high: 30, low: 24, weather: "clear", icon: "☀️" },
+      { date: 15, high: 31, low: 25, weather: "clear", icon: "☀️" },
+      { date: 16, high: 30, low: 24, weather: "clear", icon: "☀️" },
+      { date: 17, high: 29, low: 23, weather: "clouds", icon: "⛅" },
+      { date: 18, high: 28, low: 22, weather: "clouds", icon: "⛅" },
+      { date: 19, high: 27, low: 21, weather: "rain", icon: "🌧️" },
+      { date: 20, high: 26, low: 20, weather: "rain", icon: "🌧️" },
+      { date: 21, high: 27, low: 21, weather: "clouds", icon: "☁️" },
+      { date: 22, high: 28, low: 22, weather: "clouds", icon: "☁️" },
+      { date: 23, high: 29, low: 23, weather: "clear", icon: "☀️" },
+      { date: 24, high: 30, low: 24, weather: "clear", icon: "☀️" },
+      { date: 25, high: 31, low: 25, weather: "clear", icon: "☀️" },
+      { date: 26, high: 30, low: 24, weather: "clouds", icon: "⛅" },
+      { date: 27, high: 29, low: 23, weather: "clouds", icon: "⛅" },
+      { date: 28, high: 28, low: 22, weather: "rain", icon: "🌧️" },
+      { date: 29, high: 27, low: 21, weather: "rain", icon: "🌧️" },
+      { date: 30, high: 26, low: 20, weather: "clouds", icon: "☁️" }
+    ]
   }
-  // Thêm các tỉnh/thành khác
-    };
+};
 
-    // Function to get weather icon URL
     function getWeatherIcon(weather) {
       const iconMap = {
         "clear": "https://cdn-icons-png.flaticon.com/512/869/869869.png",
@@ -571,196 +842,148 @@
       };
       return iconMap[weather] || iconMap["clouds"];
     }
-
-    // Function to calculate monthly summary
     function calculateMonthlySummary(monthData) {
-      if (!monthData || monthData.length === 0) {
-        return {
-          avgTemp: '--',
-          maxTemp: '--',
-          minTemp: '--',
-          rainyDays: '--'
-        };
-      }
-
+      if (!monthData || monthData.length === 0) return {
+        avgTemp: '--', maxTemp: '--', minTemp: '--', rainyDays: '--'
+      };
       const temps = monthData.map(d => d.high);
       const lowTemps = monthData.map(d => d.low);
       const allTemps = [...temps, ...lowTemps];
-      
       const avgTemp = Math.round(allTemps.reduce((a, b) => a + b, 0) / allTemps.length);
       const maxTemp = Math.max(...temps);
       const minTemp = Math.min(...lowTemps);
       const rainyDays = monthData.filter(d => d.weather === 'rain').length;
-
       return { avgTemp, maxTemp, minTemp, rainyDays };
     }
-
-    // Function to update monthly summary display
     function updateMonthlySummary(monthData) {
       const summary = calculateMonthlySummary(monthData);
-      
       document.getElementById('avg-temp').textContent = summary.avgTemp + '°C';
       document.getElementById('max-temp').textContent = summary.maxTemp + '°C';
       document.getElementById('min-temp').textContent = summary.minTemp + '°C';
       document.getElementById('rainy-days').textContent = summary.rainyDays + '日';
     }
-
-    // Function to generate calendar for a specific month
+    function getWeatherDesc(weather) {
+      switch(weather) {
+        case "clear": return "快晴の一日です。外出や洗濯に最適な天気です。";
+        case "clouds": return "雲が広がりますが、過ごしやすい気候です。";
+        case "rain": return "雨が降ります。傘を忘れずに！";
+        case "snow": return "雪が降る可能性があります。防寒対策を！";
+        case "thunder": return "雷雨の恐れがあります。外出は控えましょう。";
+        default: return "天気情報はありません。";
+      }
+    }
+    function getDayExtra(dayData) {
+      const wind = Math.round(2 + Math.random()*6);
+      const humidity = Math.round(55 + Math.random()*35);
+      const uv = Math.round(2 + Math.random()*7);
+      return `<span><i class="fa-solid fa-wind"></i> 風速: ${wind} m/s</span>
+              <span><i class="fa-solid fa-droplet"></i> 湿度: ${humidity}%</span>
+              <span><i class="fa-solid fa-sun"></i> UV指数: ${uv}</span>`;
+    }
+    function getWeatherName(weather) {
+      switch(weather) {
+        case "clear": return "晴れ";
+        case "clouds": return "曇り";
+        case "rain": return "雨";
+        case "snow": return "雪";
+        case "thunder": return "雷雨";
+        default: return "不明";
+      }
+    }
+    function showDayDetail(dayData, dateStr, weatherName) {
+      document.getElementById('day-detail-panel').style.display = 'block';
+      document.getElementById('day-detail-date').textContent = dateStr;
+      document.getElementById('day-detail-icon').src = getWeatherIcon(dayData.weather);
+      document.getElementById('day-detail-temp').textContent = `${dayData.high}° / ${dayData.low}°`;
+      document.getElementById('day-detail-weather').textContent = weatherName;
+      document.getElementById('day-detail-desc').textContent = getWeatherDesc(dayData.weather);
+      document.getElementById('day-detail-extra').innerHTML = getDayExtra(dayData);
+    }
+    document.getElementById('day-detail-close').onclick = function() {
+      document.getElementById('day-detail-panel').style.display = 'none';
+      document.querySelectorAll('.calendar-day.selected').forEach(el => el.classList.remove('selected'));
+    };
     function generateCalendar(location, year, month) {
       const calendarGrid = document.getElementById("calendar-grid");
       calendarGrid.innerHTML = "";
-
-      // Get the first day of the month
       const firstDay = new Date(year, month, 1);
-      const startingDay = firstDay.getDay(); // 0 = Sunday, 1 = Monday, etc.
-
-      // Get the number of days in the month
+      const startingDay = firstDay.getDay();
       const lastDay = new Date(year, month + 1, 0);
       const totalDays = lastDay.getDate();
-
-      // Get the weather data for this month
       const monthKey = `${year}-${String(month + 1).padStart(2, '0')}`;
       const monthData = weatherData[location][monthKey] || [];
-
-      // Update monthly summary
       updateMonthlySummary(monthData);
-
-      // Create empty cells for days before the first day of the month
       for (let i = 0; i < startingDay; i++) {
         const emptyDay = document.createElement("div");
         emptyDay.className = "calendar-day next-month";
         calendarGrid.appendChild(emptyDay);
       }
-
-      // Create cells for each day of the month
       for (let day = 1; day <= totalDays; day++) {
         const dayCell = document.createElement("div");
         dayCell.className = "calendar-day";
-
         const dateDiv = document.createElement("div");
         dateDiv.className = "date";
         dateDiv.textContent = day;
         dayCell.appendChild(dateDiv);
-
-        // Find weather data for this day
         const dayData = monthData.find(d => d.date === day);
-        
         if (dayData) {
           const weatherIcon = document.createElement("img");
           weatherIcon.className = "weather-icon";
           weatherIcon.src = getWeatherIcon(dayData.weather);
           weatherIcon.alt = dayData.weather;
           dayCell.appendChild(weatherIcon);
-
           const tempHigh = document.createElement("div");
           tempHigh.className = "temp-high";
           tempHigh.textContent = `${dayData.high}°`;
           dayCell.appendChild(tempHigh);
-
           const tempLow = document.createElement("div");
           tempLow.className = "temp-low";
           tempLow.textContent = `${dayData.low}°`;
           dayCell.appendChild(tempLow);
+          dayCell.onclick = function() {
+            document.querySelectorAll('.calendar-day.selected').forEach(el => el.classList.remove('selected'));
+            dayCell.classList.add('selected');
+            const dateStr = `${year}年${month+1}月${day}日`;
+            showDayDetail(dayData, dateStr, getWeatherName(dayData.weather));
+          };
         }
-
         calendarGrid.appendChild(dayCell);
       }
-
-      // Fill remaining cells with next month's days
-      const totalCells = 42; // 6 rows of 7 days
+      const totalCells = 42;
       const remainingCells = totalCells - (startingDay + totalDays);
-      
       for (let i = 1; i <= remainingCells && i <= 7; i++) {
         const nextMonthDay = document.createElement("div");
         nextMonthDay.className = "calendar-day next-month";
-        
         const dateDiv = document.createElement("div");
         dateDiv.className = "date";
         dateDiv.textContent = i;
         nextMonthDay.appendChild(dateDiv);
-        
         calendarGrid.appendChild(nextMonthDay);
       }
+      document.getElementById('day-detail-panel').style.display = 'none';
+      document.querySelectorAll('.calendar-day.selected').forEach(el => el.classList.remove('selected'));
     }
-
-    // Initialize calendar with current month (July 2025)
+    // Khởi tạo mặc định
     let currentLocation = 'yokohama';
-let currentYear = 2025;
-let currentMonth = 6; // July
-
-document.getElementById('location-select').addEventListener('change', function() {
-  currentLocation = this.value;
-  generateCalendar(currentLocation, currentYear, currentMonth);
-});
-
-// Khi đổi tháng
-function onMonthChange(month, year) {
-  currentMonth = month;
-  currentYear = year;
-  generateCalendar(currentLocation, currentYear, currentMonth);
-}
-
-// Khi load trang
-generateCalendar(currentLocation, currentYear, currentMonth);
-
-    // Add event listeners to month buttons
+    let currentYear = 2025;
+    let currentMonth = 6;
+    document.getElementById('location-select').addEventListener('change', function() {
+      currentLocation = this.value;
+      generateCalendar(currentLocation, currentYear, currentMonth);
+    });
     document.querySelectorAll('.month-btn').forEach(button => {
       button.addEventListener('click', function() {
-        // Remove active class from all buttons
-        document.querySelectorAll('.month-btn').forEach(btn => {
-          btn.classList.remove('active');
-        });
-        
-        // Add active class to clicked button
+        document.querySelectorAll('.month-btn').forEach(btn => btn.classList.remove('active'));
         this.classList.add('active');
-        
-        // Get month from data attribute
         const month = parseInt(this.getAttribute('data-month'));
         currentMonth = month;
-        
-        // Adjust year if needed (months 0-4 are 2026, months 5-11 are 2025)
         currentYear = month >= 5 ? 2025 : 2026;
-        
-        // Generate calendar for selected month
-        generateCalendar('yokohama', currentYear, currentMonth);
+        generateCalendar(currentLocation, currentYear, currentMonth);
       });
     });
+    generateCalendar(currentLocation, currentYear, currentMonth);
 
-    // Navigation between pages
-    document.getElementById('home-icon').addEventListener('click', function() {
-      // Navigate to main page - you can modify this URL as needed
-      window.location.href = 'index.html';
-    });
-    
-    document.getElementById('weather-map-icon').addEventListener('click', function() {
-      // Navigate to weather map page
-      window.location.href = 'maps.html';
-    });
-    
-    document.getElementById('time-icon').addEventListener('click', function() {
-      // Navigate to time page
-      window.location.href = 'time.html';
-    });
-    
-    document.getElementById('calendar-icon').addEventListener('click', function() {
-      // Already on calendar page, maybe refresh or do nothing
-      location.reload();
-    });
-
-    // Location selection change
-    document.getElementById('location-select').addEventListener('change', function() {
-      const selectedLocation = this.value;
-      // Update weather data and calendar based on selected location
-      // For now, just log the selected location
-      console.log("Selected location:", selectedLocation);
-
-      // TODO: Update weather data and regenerate calendar for the selected location
-    });
-  </script>
-
-  <!-- Đặt script điều hướng ở cuối file, ngay trước </body> -->
-  <script>
-    // Sidebar navigation giống index.html
+    // Sidebar navigation
     document.getElementById('home-icon').onclick = function() {
       window.location.href = 'index.html';
     };
@@ -771,13 +994,10 @@ generateCalendar(currentLocation, currentYear, currentMonth);
       window.location.href = 'time.html';
     };
     document.getElementById('calendar-icon').onclick = function() {
-      window.location.href = 'monthly forecast.html';
+      window.location.href = 'monthly-forecast.html';
     };
     document.getElementById('cloud-icon').onclick = function() {
       window.location.href = 'warning.html';
-    };
-    document.getElementById('smile-icon').onclick = function() {
-      window.location.href = 'note.html';
     };
   </script>
 </body>

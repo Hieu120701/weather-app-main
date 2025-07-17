@@ -3,40 +3,308 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Weather App</title>
+  <title>Weather App </title>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Inter:wght@400;600;900&display=swap">
-  <link rel="stylesheet" href="style.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
   <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
   <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    /* WOW Background Gradient Animation */
+   body {
+  font-family: 'Inter', 'Segoe UI', Arial, sans-serif;
+  background: linear-gradient(120deg, #fbc2eb 0%, #a6c1ee 100%);
+  min-height: 100vh;
+  color: #222;
+  overflow-x: hidden;
+  transition: background 0.6s, color 0.5s;
+  position: relative;
+}
+body::before {
+  content: '';
+  position: fixed;
+  top: 0; left: 0;
+  width: 100vw; height: 100vh;
+  background: radial-gradient(circle at 70% 20%, #fff7f7 0%, #c3e6ff 60%, transparent 100%),
+              radial-gradient(circle at 10% 80%, #eaf6fb 0%, #e3e5fa 60%, transparent 100%);
+  opacity: 0.7;
+  z-index: 0;
+  pointer-events: none;
+  animation: bgmove 12s infinite alternate;
+}
+@keyframes bgmove {
+  0% { filter: blur(4px); }
+  100% { filter: blur(18px) brightness(1.08); }
+}
+.divider {
+  border-bottom: 2px solid #e1e2e9;
+  margin: 36px 0 24px 0;
+  opacity: 0.7;
+}
+.sidebar {
+  position: fixed; top: 0; left: 0;
+  width: 84px; height: 100vh;
+  background: rgba(34,44,70,0.97);
+  box-shadow: 8px 0 34px 0 rgba(100,140,255,0.19);
+  border-right: 2px solid rgba(255,255,255,0.17);
+  z-index: 30;
+  display: flex; flex-direction: column; align-items: center;
+}
+.sidebar-content {
+  display: flex; flex-direction: column; gap: 34px;
+  margin-top: 54px; align-items: center; width: 100%;
+}
+.sidebar-item {
+  background: none; border: none; outline: none;
+  padding: 16px;
+  border-radius: 18px;
+  font-size: 2.1rem;
+  color: #c3dafe;
+  cursor: pointer;
+  margin-bottom: 8px;
+  transition: background 0.3s, color 0.3s, transform 0.35s;
+  box-shadow: 0 1px 7px 0 rgba(120,120,255,0.07);
+  display: flex; align-items: center; justify-content: center;
+  animation: sidebarIdle 6s infinite alternate;
+}
+@keyframes sidebarIdle {
+  0% { transform: scale(1);}
+  65% { transform: scale(1.04);}
+  100% { transform: scale(1);}
+}
+.sidebar-item.active, .sidebar-item:hover {
+  background: linear-gradient(90deg, #a1c4fd 0%, #c2e9fb 100%);
+  color: #4474e4;
+  box-shadow: 0 3px 20px rgba(120, 120, 255, 0.15);
+  transform: scale(1.10) translateY(-7px);
+  animation: sidebarBounce 0.5s;
+  animation-iteration-count: 1;
+}
+@keyframes sidebarBounce {
+  0%   { transform: scale(1) translateY(0);}
+  40%  { transform: scale(1.22) translateY(-12px);}
+  70%  { transform: scale(0.98) translateY(8px);}
+  100% { transform: scale(1.10) translateY(-7px);}
+}
+.main-content {
+  margin-left: 104px;
+  padding: 54px 5vw 38px 5vw;
+  max-width: 1450px;
+  min-height: 100vh;
+  position: relative;
+  z-index: 10;
+  animation: fadein 0.9s;
+}
+@keyframes fadein {
+  from{ opacity:0; transform: translateY(50px);}
+  to{ opacity:1; transform: translateY(0);}
+}
+@media (max-width: 900px) {
+  .main-content { margin-left: 0; padding: 30px 1vw;}
+  .sidebar { width: 60px;}
+  .sidebar-item { font-size:1.4rem; padding:9px;}
+}
+.search {
+  display: flex; gap: 16px;
+  align-items: center;
+  margin-bottom: 35px;
+  background: rgba(255,255,255,0.55);
+  border-radius: 22px;
+  box-shadow: 0 1px 10px 0 #b5b5ee22;
+  padding: 14px 28px;
+  animation: fadein 1.2s;
+}
+.search input[type="text"] {
+  flex: 1 1 320px;
+  min-width: 180px;
+  padding: 15px 22px;
+  border: none;
+  border-radius: 22px;
+  font-size: 1.11rem;
+  background: #f7fafc;
+  color: #222;
+  box-shadow: 0 1px 8px rgba(100,100,200,0.07);
+  outline: none;
+  transition: background 0.25s, color 0.25s;
+  font-family: inherit;
+}
+.search button {
+  background: linear-gradient(90deg, #a1c4fd 0%, #c2e9fb 100%);
+  border: none;
+  border-radius: 50%;
+  width: 48px; height: 48px;
+  font-size: 1.5rem;
+  color: #4474e4;
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s;
+}
+.search button:hover {
+  background: linear-gradient(90deg, #fbc2eb 0%, #a6c1ee 100%);
+  color: #232526;
+  transform: scale(1.07);
+}
+#toggle-mode { background: linear-gradient(90deg, #fbc2eb 0%, #a6c1ee 100%); color: #232526;}
+.main-cards-row {
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+  gap: 38px; margin-bottom: 40px;
+}
+#current-weather { min-width:350px; }
+.weather-card-header {
+  display: flex; flex-direction: column; align-items: center; margin-bottom: 7px;
+}
+.city { font-size: 2.1rem; font-weight: 700; letter-spacing: 1px;}
+.text-sm { font-size: 1rem; color: #7b7b7b; margin-top: 2px;}
+.weather-icon-big {
+  width: 92px; height: 92px; margin: 10px 0 4px 0;
+  filter: drop-shadow(0 2px 8px #a0c2ffaa);
+  animation: iconWeatherIdle 3s infinite linear;
+}
+@keyframes iconWeatherIdle {
+  0%   { transform: scale(1) translateY(0);}
+  10%  { transform: scale(1.11) translateY(-7px);}
+  20%  { transform: scale(1.05) translateY(6px);}
+  30%  { transform: scale(1) translateY(0);}
+  100% { transform: scale(1) translateY(0);}
+}
+.temp-display { font-size: 2.8rem; font-weight: 900; margin: 9px 0 2px 0; color: #2196f3; letter-spacing: 1px;}
+.desc-display { font-size: 1.1rem; color: #6c63ff; margin-bottom: 10px; font-weight: 600; text-align: center;}
+.details { display: flex; gap: 22px; margin-top: 8px; width: 100%; justify-content: center;}
+.details .col { display: flex; align-items: center; gap: 7px;}
+.icon-small { width: 29px; height: 29px; filter: drop-shadow(0 1px 8px #c0d4fc88);}
+.detail-label { font-size: 1rem; color: #6c757d;}
+.card-block { display: flex; flex-direction: column; align-items: center; width: 100%;}
+.card-block-title { font-weight: 700; font-size: 1.15rem; margin-bottom: 7px;}
+.locate-btn {
+  background: linear-gradient(90deg, #fbc2eb 0%, #a6c1ee 100%);
+  color: #4c566a;
+  border-radius: 50%; width: 44px; height: 44px; font-size: 1.25rem;
+  border: none; margin-bottom: 7px; margin-top: 3px; cursor: pointer;
+  transition: background 0.18s;
+  box-shadow: 0 2px 8px #c9e6fc55;
+  animation: shine 3.2s infinite alternate;
+}
+.locate-btn:hover {
+  background: linear-gradient(90deg, #8ec5fc 0%, #e0c3fc 100%);
+  color: #222;
+  transform: scale(1.09);
+}
+.sun-info { width: 100%; display: flex; flex-direction: column; gap: 13px; align-items: flex-start; margin-bottom: 12px;}
+.sun-info > div { display: flex; align-items: center; gap: 7px; font-size: 1.09rem;}
+.font-bold { font-weight: 700;}
+.icon-sunrise, .icon-sunset, .icon-clock { width: 24px; height: 24px; vertical-align: middle; margin-right: 2px;}
+#sunChart { margin-top: 10px; border-radius: 13px; background: rgba(240,240,255,0.42); box-shadow: 0 2px 10px 0 #b5b5ee22;}
+.hourly-section {
+  background: rgba(255,255,255,0.88);
+  border-radius: 22px;
+  padding: 26px 22px 22px 22px;
+  margin-bottom: 20px;
+  box-shadow: 0 2px 18px 0 #b3b3e322;
+  transition: background 0.35s;
+  position: relative;
+  overflow: hidden;
+  animation: fadein 1.5s;
+}
+.section-title { font-size: 1.3rem; font-weight: 700; margin-bottom: 12px; color: #4b5c6b;}
+.tab-menu { margin-bottom: 14px; display: flex; flex-wrap: wrap; gap: 13px;}
+.tab-btn { padding: 9px 19px; border-radius: 18px; border: none; background: #e0eafc; color: #546e7a; font-size: 1.09rem; font-weight: 500; cursor: pointer; transition: background 0.2s, color 0.2s;}
+.tab-btn.active, .tab-btn:hover { background: linear-gradient(90deg, #fbc2eb 0%, #a6c1ee 100%); color: #232526; }
+.table-responsive {
+  width: 100%;
+  overflow-x: auto;
+  min-width: 700px;
+  max-width: 100vw;
+}
+#hourlyChart { border-radius: 13px; background: rgba(245,250,255,0.60); margin-bottom: 12px; box-shadow: 0 1px 8px 0 #b5b5ee22;}
+#daily-forecast { display: flex; gap: 16px; justify-content: center; flex-wrap: wrap;}
+.daily-card {
+  background: linear-gradient(130deg, #f9f9f9 60%, #e0eafc 100%);
+  border-radius: 15px;
+  padding: 12px 16px;
+  min-width: 80px;
+  text-align: center;
+  box-shadow: 0 1px 11px 0 #c1c7e822;
+  display: flex; flex-direction: column; align-items: center;
+  font-size: 1.03rem;
+  animation: fadein 2.1s;
+}
+.daily-icon { width: 35px; height: 35px; margin: 7px 0;}
+.weather-detail-header { display: flex; align-items: center; gap: 16px; margin-bottom: 18px; margin-top: 34px; justify-content: start;}
+.weather-detail-title { font-size: 1.2rem; font-weight: 700; color: #7a4cff; letter-spacing: 0.5px;}
+.weather-detail-time { font-size: 1rem; color: #b0b0b0; font-weight: 500;}
+.weather-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(270px, 1fr));
+  gap: 32px;
+  margin-bottom: 32px;
+}
+.card.glass { background: rgba(255,255,255,0.76); border-radius: 19px; padding: 18px 11px 15px 13px; box-shadow: 0 1px 7px 0 #b3b3e322; display: flex; flex-direction: column; align-items: center; min-height: 120px; transition: background 0.3s;}
+.card-title { font-size: 1.05rem; font-weight: 700; color: #4b5c6b;}
+.card-main { font-size: 2rem; font-weight: 700; margin: 7px 0; color: #2196f3; display: flex; align-items: center; gap: 8px;}
+.card-desc { color: #7b7b7b; font-size: 1rem; margin-bottom: 8px; text-align: center;}
+.wind-time-label { font-size: 0.97rem; color: #7a4cff; font-weight: 500; margin-left: 7px;}
+canvas[id$='-spark'] { margin-top: 4px; border-radius: 8px; background: rgba(230,240,255,0.32); box-shadow: 0 1px 8px 0 #b5b5ee22;}
+#weather-map-container {
+  background: rgba(255,255,255,0.82);
+  border-radius: 21px;
+  box-shadow: 0 2px 18px 0 #b3b3e322;
+  padding: 24px 18px;
+  margin-bottom: 24px; margin-top: 24px;
+}
+#map { border-radius: 16px; box-shadow: 0 1px 7px 0 #b5b5ee22; margin-bottom: 12px;}
+#weather-alert { color: #e53e3e; font-weight: 600; background: #fff5f5; border-radius: 8px; padding: 8px 14px; box-shadow: 0 1px 7px 0 #ffbaba12;}
+.mt-2 { margin-top: 12px !important; }
+.mt-8 { margin-top: 44px !important; }
+.mb-4 { margin-bottom: 16px !important; }
+.text-center { text-align: center !important; }
+.text-xs { font-size: 0.92rem !important; }
+footer { margin-top: 40px; width: 100%; }
+footer p { color: #888; text-align: center; font-size: 1.03rem; letter-spacing: 1px;}
+@media (max-width: 600px) {
+  .main-cards-row { grid-template-columns: 1fr; gap: 20px;}
+  .weather-grid { grid-template-columns: 1fr 1fr; gap: 13px;}
+  .main-content { padding: 16px 1vw;}
+  .sidebar { width: 56px; }
+  .sidebar-content { gap: 18px;}
+  .sidebar-item { font-size: 1rem; padding: 6px;}
+  .table-responsive { min-width: 350px; }
+}
+  </style>
 </head>
 <body>
-  <!-- Sidebar -->
   <aside class="sidebar" aria-label="Main navigation">
     <nav class="sidebar-content">
-      <button class="sidebar-item active" title="Trang chủ">
-        <i class="fa-solid fa-house sidebar-icon" id="home-icon"></i>
+      <button class="sidebar-item active" title="Trang chủ" id="home-icon">
+        <i class="fa-solid fa-house sidebar-icon"></i>
       </button>
-      <button class="sidebar-item" title="Bản đồ thời tiết">
-        <i class="fa-solid fa-bullseye sidebar-icon" id="weather-map-icon"></i>
+      <button class="sidebar-item" title="Bản đồ thời tiết" id="weather-map-icon">
+        <i class="fa-solid fa-bullseye sidebar-icon"></i>
       </button>
-      <button class="sidebar-item" title="Thời gian">
-        <i class="fa-regular fa-clock sidebar-icon" id="time-icon"></i>
+      <button class="sidebar-item" title="Thời gian" id="time-icon">
+        <i class="fa-regular fa-clock sidebar-icon"></i>
       </button>
-      <button class="sidebar-item" title="Lịch tháng">
-        <i class="fa-regular fa-calendar sidebar-icon" id="calendar-icon"></i>
+      <button class="sidebar-item" title="Lịch tháng" id="calendar-icon">
+        <i class="fa-regular fa-calendar sidebar-icon"></i>
       </button>
-      <button class="sidebar-item" title="Cảnh báo thời tiết">
-        <i class="fa-solid fa-cloud sidebar-icon" id="cloud-icon"></i>
-      </button>
-      <button class="sidebar-item" title="Ghi chú">
-        <i class="fa-regular fa-face-smile sidebar-icon" id="smile-icon"></i>
+      <button class="sidebar-item" title="Cảnh báo thời tiết" id="cloud-icon">
+        <i class="fa-solid fa-cloud sidebar-icon"></i>
       </button>
     </nav>
   </aside>
-
-  <!-- Main Content -->
+  <section class="weather-hero-row">
+  <!-- Block 1: Weather -->
+  <div class="weather-hero-block">
+    <!-- Nội dung thời tiết hiện tại -->
+  </div>
+  <!-- Block 2: Windy Map -->
+  <div class="weather-hero-block center">
+    <!-- Nội dung Windy map -->
+  </div>
+  <!-- Block 3: Sun Info -->
+  <div class="weather-hero-block">
+    <!-- Nội dung mặt trời -->
+  </div>
+</section>
   <main class="main-content">
     <!-- Search Bar -->
     <form class="search" autocomplete="off" onsubmit="event.preventDefault();">
@@ -48,10 +316,7 @@
         <i class="fa-regular fa-moon"></i>
       </button>
     </form>
-
-    <!-- Cards Row -->
     <section class="main-cards-row">
-      <!-- Current Weather Card -->
       <section id="current-weather" class="main-card glass" aria-label="Thời tiết hiện tại">
         <div class="weather-card-header">
           <h1 class="city" id="location-name">都市名</h1>
@@ -77,7 +342,6 @@
           </div>
         </div>
       </section>
-      <!-- Windy Map Card -->
       <section class="main-card glass" aria-label="Bản đồ gió">
         <div class="card-block">
           <span class="card-block-title">現在地で検索</span>
@@ -97,7 +361,6 @@
           </a>
         </div>
       </section>
-      <!-- Sun Chart Card -->
       <section class="main-card glass" id="sun-info" aria-label="Thông tin mặt trời">
         <div class="sun-info">
           <div>
@@ -113,14 +376,8 @@
         </div>
       </section>
     </section>
-
-    <!-- Error Message -->
     <div id="error-message" class="mb-4" role="alert"></div>
-
-    <!-- Notice Section -->
     <div id="weather-notice" aria-live="polite"></div>
-
-    <!-- Hourly Forecast -->
     <section class="hourly-section mt-2">
       <header>
         <h2 class="section-title">1時間ごとの予報</h2>
@@ -141,8 +398,6 @@
         <div id="daily-forecast"></div>
       </div>
     </section>
-
-    <!-- Weather Detail Grid -->
     <section>
       <header class="weather-detail-header">
         <span class="weather-detail-title">天気の詳細情報</span>
@@ -217,15 +472,13 @@
       </div>
     </section>
     <footer>
-      <p class="mt-8 text-center text-xs" style="opacity:.6">Made by VINMO.DEV</p>
+      <p class="mt-8 text-center text-xs" style="opacity:.7">Made by VINMO.DEV <span style="color:#ff4181; font-size:1.15em;">♥</span></p>
     </footer>
-    <!-- Weather Map and Alert -->
     <section id="weather-map-container" style="display:none; margin-top: 16px;">
       <div id="map" style="height:400px;"></div>
       <div id="weather-alert" style="color:red; margin-top:8px;"></div>
     </section>
   </main>
-  <!-- JavaScript -->
   <script>
     // --- Sun chart logic ---
     function timeToHour(timeStr) {
@@ -506,7 +759,7 @@
         renderHourlyChart(forecastData, currentHourlyType);
 
       } catch (e) {
-        document.getElementById("error-message").innerText = "天気情報の取得に失敗しました";
+        document.getElementById("error-message").innerText = "";
       }
     }
 
@@ -605,13 +858,10 @@
       window.location.href = 'time.html';
     };
     document.getElementById('calendar-icon').onclick = function() {
-      window.location.href = 'monthly forecast.html';
+      window.location.href = 'monthly-forecast.html';
     };
     document.getElementById('cloud-icon').onclick = function() {
       window.location.href = 'warning.html';
-    };
-    document.getElementById('smile-icon').onclick = function() {
-      window.location.href = 'note.html';
     };
 
     function showWeatherMap() {
