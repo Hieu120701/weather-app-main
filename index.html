@@ -269,6 +269,47 @@ footer p { color: #888; text-align: center; font-size: 1.03rem; letter-spacing: 
   .sidebar-item { font-size: 1rem; padding: 6px;}
   .table-responsive { min-width: 350px; }
 }
+body.dark-mode {
+  background: linear-gradient(120deg, #232526 0%, #414345 100%);
+  color: #e1e6f1;
+}
+body.dark-mode .hourly-section,
+body.dark-mode .main-card,
+body.dark-mode .glass,
+body.dark-mode .search,
+body.dark-mode .sidebar,
+body.dark-mode .card,
+body.dark-mode .main-content,
+body.dark-mode .divider,
+body.dark-mode .tab-btn,
+body.dark-mode .weather-grid,
+body.dark-mode .daily-card,
+body.dark-mode .table-responsive,
+body.dark-mode #weather-map-container
+{
+  background: rgba(30,36,55,0.89) !important;
+  color: #e1e6f1 !important;
+  box-shadow: 0 4px 24px #151b29cc, 0 1px 9px #0002;
+}
+
+body.dark-mode .tab-btn.active,
+body.dark-mode .tab-btn:hover {
+  background: linear-gradient(90deg, #232526 0%, #414345 100%) !important;
+  color: #fff !important;
+}
+
+body.dark-mode .sidebar {
+  background: rgba(10,15,28,0.98) !important;
+  border-right: 2px solid #2e2e3a !important;
+}
+
+body.light-mode {
+  background: linear-gradient(120deg, #fbc2eb 0%, #a6c1ee 100%);
+  color: #222;
+}
+
+/* Nếu thích, có thể thêm các màu sáng cho light-mode, nhưng mặc định đã là sáng */
+
   </style>
 </head>
 <body>
@@ -289,7 +330,7 @@ footer p { color: #888; text-align: center; font-size: 1.03rem; letter-spacing: 
       <button class="sidebar-item" title="Cảnh báo thời tiết" id="cloud-icon">
         <i class="fa-solid fa-cloud sidebar-icon"></i>
       </button>
-    </nav>
+ </nav>
   </aside>
   <section class="weather-hero-row">
   <!-- Block 1: Weather -->
@@ -612,7 +653,7 @@ footer p { color: #888; text-align: center; font-size: 1.03rem; letter-spacing: 
           color = 'brown';
           break;
       }
-
+      
       const ctx = document.getElementById('hourlyChart').getContext('2d');
       if (hourlyChart) {
         hourlyChart.destroy();
@@ -874,6 +915,7 @@ footer p { color: #888; text-align: center; font-size: 1.03rem; letter-spacing: 
         L.tileLayer(`https://tile.openweathermap.org/map/clouds_new/{z}/{x}/{y}.png?appid=${apikey}`).addTo(window.weatherMap);
       }
     }
+    
   </script>
 </body>
 </html>
