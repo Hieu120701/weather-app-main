@@ -41,6 +41,7 @@ body::before {
   margin: 36px 0 24px 0;
   opacity: 0.7;
 }
+
 .sidebar {
   position: fixed; top: 0; left: 0;
   width: 84px; height: 100vh;
@@ -307,6 +308,24 @@ body.light-mode {
   background: linear-gradient(120deg, #fbc2eb 0%, #a6c1ee 100%);
   color: #222;
 }
+.sidebar {
+  position: fixed; top: 0; left: 0;
+  width: 84px; height: 100vh;
+  background: rgba(34,44,70,0.97);
+  box-shadow: 8px 0 34px 0 rgba(100,140,255,0.19);
+  border-right: 2px solid rgba(255,255,255,0.17);
+  z-index: 30;
+  display: flex; flex-direction: column; align-items: center;
+  justify-content: center; /* thêm dòng này */
+}
+.sidebar-content {
+  display: flex; flex-direction: column; gap: 34px;
+  align-items: center; width: 100%;
+  justify-content: center; /* thêm dòng này */
+  height: 100%;
+  /* xóa margin-top nếu có */
+}
+
 
 /* Nếu thích, có thể thêm các màu sáng cho light-mode, nhưng mặc định đã là sáng */
 
@@ -314,24 +333,24 @@ body.light-mode {
 </head>
 <body>
   <aside class="sidebar" aria-label="Main navigation">
-    <nav class="sidebar-content">
-      <button class="sidebar-item active" title="Trang chủ" id="home-icon">
-        <i class="fa-solid fa-house sidebar-icon"></i>
-      </button>
-      <button class="sidebar-item" title="Bản đồ thời tiết" id="weather-map-icon">
-        <i class="fa-solid fa-bullseye sidebar-icon"></i>
-      </button>
-      <button class="sidebar-item" title="Thời gian" id="time-icon">
-        <i class="fa-regular fa-clock sidebar-icon"></i>
-      </button>
-      <button class="sidebar-item" title="Lịch tháng" id="calendar-icon">
-        <i class="fa-regular fa-calendar sidebar-icon"></i>
-      </button>
-      <button class="sidebar-item" title="Cảnh báo thời tiết" id="cloud-icon">
-        <i class="fa-solid fa-cloud sidebar-icon"></i>
-      </button>
- </nav>
-  </aside>
+  <nav class="sidebar-content">
+    <button class="sidebar-item active" title="Trang chủ" id="home-icon">
+      <i class="fa-solid fa-house sidebar-icon"></i>
+    </button>
+    <button class="sidebar-item" title="Bản đồ thời tiết" id="weather-map-icon">
+      <i class="fa-solid fa-map-location-dot sidebar-icon"></i>
+    </button>
+    <button class="sidebar-item" title="Thời gian" id="time-icon">
+      <i class="fa-regular fa-clock sidebar-icon"></i>
+    </button>
+    <button class="sidebar-item" title="Lịch tháng" id="calendar-icon">
+      <i class="fa-regular fa-calendar sidebar-icon"></i>
+    </button>
+    <button class="sidebar-item" title="Cảnh báo thời tiết" id="cloud-icon">
+      <i class="fa-solid fa-cloud sidebar-icon"></i>
+    </button>
+  </nav>
+</aside>
   <section class="weather-hero-row">
   <!-- Block 1: Weather -->
   <div class="weather-hero-block">

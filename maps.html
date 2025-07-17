@@ -112,13 +112,13 @@
       border: 2.2px solid transparent;
     }
     .sidebar-icon:hover, .sidebar-item.active .sidebar-icon {
-      background: var(--glass-light);
-      color: var(--primary);
-      border-color: var(--accent);
-      box-shadow: var(--glow);
-      filter: brightness(1.18);
-      animation: wiggle .5s;
-    }
+  background: var(--glass-light);
+  color: var(--primary);
+  border-color: transparent; /* hoặc bỏ dòng này */
+  box-shadow: none;          /* bỏ hiệu ứng vàng */
+  filter: brightness(1.18);
+  animation: wiggle .5s;
+}
     @keyframes wiggle {
       0% { transform: rotate(-9deg);}
       40% { transform: rotate(7deg);}
@@ -300,28 +300,45 @@
       .tab-btn { font-size: 0.82rem; padding: 6px 11px;}
       #windy-map { height: 33vh; }
     }
+    .sidebar {
+  position: fixed; top: 0; left: 0;
+  width: 84px; height: 100vh;
+  background: rgba(34,44,70,0.97);
+  box-shadow: 8px 0 34px 0 rgba(100,140,255,0.19);
+  border-right: 2px solid rgba(255,255,255,0.17);
+  z-index: 30;
+  display: flex; flex-direction: column; align-items: center;
+  justify-content: center; /* thêm dòng này */
+}
+.sidebar-content {
+  display: flex; flex-direction: column; gap: 34px;
+  align-items: center; width: 100%;
+  justify-content: center; /* thêm dòng này */
+  height: 100%;
+  /* xóa margin-top nếu có */
+}
   </style>
 </head>
 <body>
-  <div class="sidebar">
-    <div class="sidebar-content">
-      <button class="sidebar-item" id="home-icon" title="ホーム">
-        <i class="fa-solid fa-house sidebar-icon"></i>
-      </button>
-      <button class="sidebar-item active" id="weather-map-icon" title="天気地図">
-        <i class="fa-solid fa-bullseye sidebar-icon"></i>
-      </button>
-      <button class="sidebar-item" id="time-icon" title="時間">
-        <i class="fa-regular fa-clock sidebar-icon"></i>
-      </button>
-      <button class="sidebar-item" id="calendar-icon" title="カレンダー">
-        <i class="fa-regular fa-calendar sidebar-icon"></i>
-      </button>
-      <button class="sidebar-item" id="cloud-icon" title="天気警報">
-        <i class="fa-solid fa-cloud sidebar-icon"></i>
-      </button>
-    </div>
+  <nav class="sidebar">
+  <div class="sidebar-content">
+    <button class="sidebar-item" id="home-icon" title="ホーム">
+      <i class="fa-solid fa-house sidebar-icon"></i>
+    </button>
+    <button class="sidebar-item" id="weather-map-icon" title="天気地図">
+      <i class="fa-solid fa-map-location-dot sidebar-icon"></i>
+    </button>
+    <button class="sidebar-item" id="time-icon" title="時間">
+      <i class="fa-regular fa-clock sidebar-icon"></i>
+    </button>
+    <button class="sidebar-item" id="calendar-icon" title="カレンダー">
+      <i class="fa-regular fa-calendar sidebar-icon"></i>
+    </button>
+    <button class="sidebar-item" id="cloud-icon" title="天気警報">
+      <i class="fa-solid fa-cloud sidebar-icon"></i>
+    </button>
   </div>
+</nav>
   <div class="main-map-content">
     <div class="wow-glass">
       <div class="wow-title">
