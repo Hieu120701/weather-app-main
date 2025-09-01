@@ -717,7 +717,7 @@ body.light-mode {
         const forecastResponse = await fetch(forecastApiUrl + encodeURIComponent(city) + '&appid=' + apikey + '&lang=ja');
 
         if (response.status == 404 || forecastResponse.status == 404) {
-          document.getElementById("error-message").textContent = "都市名が正しくありません";
+          document.getElementById("error-message").textContent = "none";
           document.getElementById("current-weather").style.display = "none";
           document.getElementById("hourly-forecast").style.display = "none";
           document.getElementById("sun-info").style.display = "none";
