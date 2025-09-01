@@ -334,21 +334,21 @@ body.light-mode {
 <body>
   <aside class="sidebar" aria-label="Main navigation">
   <nav class="sidebar-content">
-    <button class="sidebar-item active" title="Trang chủ" id="home-icon">
+    <a class="sidebar-item active" title="Trang chủ" id="home-icon" href="index.html">
       <i class="fa-solid fa-house sidebar-icon"></i>
-    </button>
-    <button class="sidebar-item" title="Bản đồ thời tiết" id="weather-map-icon">
+    </a>
+    <a class="sidebar-item" title="Bản đồ thời tiết" id="weather-map-icon" href="maps.html">
       <i class="fa-solid fa-map-location-dot sidebar-icon"></i>
-    </button>
-    <button class="sidebar-item" title="Thời gian" id="time-icon">
+    </a>
+    <a class="sidebar-item" title="Thời gian" id="time-icon" href="time.html">
       <i class="fa-regular fa-clock sidebar-icon"></i>
-    </button>
-    <button class="sidebar-item" title="Lịch tháng" id="calendar-icon">
+    </a>
+    <a class="sidebar-item" title="Lịch tháng" id="calendar-icon" href="monthly-forecast.html">
       <i class="fa-regular fa-calendar sidebar-icon"></i>
-    </button>
-    <button class="sidebar-item" title="Cảnh báo thời tiết" id="cloud-icon">
+    </a>
+    <a class="sidebar-item" title="Cảnh báo thời tiết" id="cloud-icon" href="warning.html">
       <i class="fa-solid fa-cloud sidebar-icon"></i>
-    </button>
+    </a>
   </nav>
 </aside>
   <section class="weather-hero-row">
@@ -918,7 +918,7 @@ body.light-mode {
       window.location.href = 'time.html';
     };
     document.getElementById('calendar-icon').onclick = function() {
-      window.location.href = 'monthly-forecast.html';
+      window.location.href = 'monthly forecast.html';
     };
     document.getElementById('cloud-icon').onclick = function() {
       window.location.href = 'warning.html';
