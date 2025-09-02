@@ -7,23 +7,126 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
+    
     html, body {
       height: 100%;
       font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-      background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+      overflow-x: hidden;
     }
+    
+    /* Enhanced Background with original colors */
     body {
       min-height: 100vh;
       display: flex;
       flex-direction: row;
-      overflow-x: hidden;
+      background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+      position: relative;
+      animation: subtleShift 20s ease-in-out infinite;
     }
+    
+    /* Floating geometric shapes with soft colors */
+    body::before {
+      content: '';
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: 
+        radial-gradient(circle at 15% 25%, rgba(195, 207, 226, 0.4) 0%, transparent 50%),
+        radial-gradient(circle at 85% 25%, rgba(245, 247, 250, 0.5) 0%, transparent 50%),
+        radial-gradient(circle at 25% 85%, rgba(195, 207, 226, 0.35) 0%, transparent 50%),
+        radial-gradient(circle at 75% 85%, rgba(225, 235, 245, 0.45) 0%, transparent 50%);
+      animation: gentleFloat 25s ease-in-out infinite;
+      z-index: -3;
+    }
+    
+    /* Subtle animated dots pattern */
+    body::after {
+      content: '';
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-image: 
+        radial-gradient(circle at 20% 30%, rgba(195, 207, 226, 0.2) 2px, transparent 2px),
+        radial-gradient(circle at 60% 70%, rgba(225, 235, 245, 0.15) 1px, transparent 1px),
+        radial-gradient(circle at 80% 20%, rgba(195, 207, 226, 0.12) 1.5px, transparent 1.5px),
+        radial-gradient(circle at 30% 80%, rgba(245, 247, 250, 0.18) 1px, transparent 1px);
+      background-size: 300px 300px, 200px 200px, 250px 250px, 180px 180px;
+      animation: dotsFloat 30s linear infinite;
+      z-index: -2;
+    }
+    
+    /* Background animations */
+    @keyframes subtleShift {
+      0%, 100% { 
+        background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+      }
+      25% { 
+        background: linear-gradient(135deg, #f8f9fc 0%, #d1dae8 100%);
+      }
+      50% { 
+        background: linear-gradient(135deg, #f2f4f8 0%, #c8d2e4 100%);
+      }
+      75% { 
+        background: linear-gradient(135deg, #f7f8fb 0%, #bcc8de 100%);
+      }
+    }
+    
+    @keyframes gentleFloat {
+      0%, 100% {
+        transform: translateX(0px) translateY(0px) scale(1) rotate(0deg);
+        opacity: 0.6;
+      }
+      25% {
+        transform: translateX(-20px) translateY(-15px) scale(1.1) rotate(45deg);
+        opacity: 0.4;
+      }
+      50% {
+        transform: translateX(15px) translateY(-25px) scale(0.9) rotate(90deg);
+        opacity: 0.8;
+      }
+      75% {
+        transform: translateX(-10px) translateY(20px) scale(1.05) rotate(135deg);
+        opacity: 0.5;
+      }
+    }
+    
+    @keyframes dotsFloat {
+      0% { transform: translateY(0px) rotate(0deg); }
+      100% { transform: translateY(-50px) rotate(180deg); }
+    }
+    
+    /* Subtle overlay */
+    .dynamic-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: 
+        linear-gradient(45deg, transparent 30%, rgba(195, 207, 226, 0.08) 50%, transparent 70%),
+        linear-gradient(-45deg, transparent 30%, rgba(245, 247, 250, 0.12) 50%, transparent 70%);
+      animation: overlayMove 15s ease-in-out infinite;
+      z-index: -1;
+      pointer-events: none;
+    }
+    
+    @keyframes overlayMove {
+      0%, 100% { transform: translateX(-50px) translateY(-30px); }
+      50% { transform: translateX(50px) translateY(30px); }
+    }
+    
     .sidebar {
       width: 80px;
-      background: rgba(34,44,70,0.94);
-      backdrop-filter: blur(18px);
-      box-shadow: 6px 0 32px 0 rgba(58,143,255,0.13);
-      border-right: 2px solid rgba(255,255,255,0.13);
+      background: rgba(34, 44, 70, 0.92);
+      backdrop-filter: blur(25px) saturate(150%);
+      box-shadow: 
+        6px 0 40px 0 rgba(58, 143, 255, 0.2), 
+        inset 0 0 0 1px rgba(255, 255, 255, 0.15);
+      border-right: 2px solid rgba(255, 255, 255, 0.18);
       display: flex;
       flex-direction: column;
       align-items: center;
@@ -34,7 +137,32 @@
       bottom: 0;
       height: 100vh;
       z-index: 100;
+      transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+      animation: sidebarFloat 8s ease-in-out infinite;
     }
+    
+    @keyframes sidebarFloat {
+      0%, 100% { transform: translateY(0px); box-shadow: 6px 0 40px 0 rgba(58, 143, 255, 0.2); }
+      50% { transform: translateY(-3px); box-shadow: 6px 0 50px 0 rgba(58, 143, 255, 0.25); }
+    }
+    
+    .sidebar::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(180deg, rgba(255, 255, 255, 0.12) 0%, transparent 50%, rgba(255, 255, 255, 0.08) 100%);
+      pointer-events: none;
+      animation: sidebarShimmer 6s ease-in-out infinite;
+    }
+    
+    @keyframes sidebarShimmer {
+      0%, 100% { opacity: 0.4; }
+      50% { opacity: 0.8; }
+    }
+    
     .sidebar-content {
       display: flex;
       flex-direction: column;
@@ -42,7 +170,9 @@
       width: 100%;
       align-items: center;
       padding: 40px 0 28px 0;
+      position: relative;
     }
+    
     .sidebar-item {
       width: 100%;
       display: flex;
@@ -53,16 +183,16 @@
       outline: none;
       border: none;
       cursor: pointer;
-      transition: background 0.2s;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
       border-radius: 15px;
-      /* Animation for hover */
       position: relative;
       overflow: visible;
     }
+    
     .sidebar-item .sidebar-icon {
       font-size: 32px;
       color: #b6c7e3;
-      transition: color 0.2s, background 0.2s, box-shadow 0.2s, transform 0.5s cubic-bezier(.76,-0.18,.56,1.6);
+      transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
       width: 48px;
       height: 48px;
       border-radius: 15px;
@@ -71,34 +201,50 @@
       justify-content: center;
       background: transparent;
       border: 1.5px solid transparent;
-      /* Default animation */
-      animation: iconIdle 2.5s infinite linear;
+      animation: iconIdle 4s ease-in-out infinite;
+      position: relative;
     }
-    /* Active and hover animation */
+    
     .sidebar-item.active .sidebar-icon,
     .sidebar-item:hover .sidebar-icon {
       color: #3a8fff;
-      border-color: #3a8fff;
-      background: rgba(255,255,255,0.21);
-      box-shadow: 0 4px 14px rgba(255,255,255,0.13);
-      animation: iconBounce 0.8s;
+      border-color: rgba(58, 143, 255, 0.6);
+      background: rgba(255, 255, 255, 0.2);
+      box-shadow: 
+        0 8px 32px rgba(58, 143, 255, 0.3),
+        0 0 0 1px rgba(255, 255, 255, 0.3),
+        inset 0 1px 0 rgba(255, 255, 255, 0.4);
+      animation: iconBounce 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55);
       animation-iteration-count: 1;
+      transform: scale(1.15);
     }
-    /* Subtle idle animation for icons */
+    
     @keyframes iconIdle {
-      0%   { transform: scale(1) rotate(0deg);}
-      8%   { transform: scale(1.07) rotate(-6deg);}
-      16%  { transform: scale(1.06) rotate(5deg);}
-      24%  { transform: scale(1) rotate(0deg);}
-      100% { transform: scale(1) rotate(0deg);}
+      0%, 100% { 
+        transform: scale(1) rotate(0deg); 
+        filter: brightness(1);
+      }
+      25% { 
+        transform: scale(1.08) rotate(-5deg); 
+        filter: brightness(1.1);
+      }
+      50% { 
+        transform: scale(1.05) rotate(0deg); 
+        filter: brightness(1.05);
+      }
+      75% { 
+        transform: scale(1.08) rotate(5deg); 
+        filter: brightness(1.1);
+      }
     }
-    /* Bounce animation on hover */
+    
     @keyframes iconBounce {
-      0%   { transform: scale(1) translateY(0);}
-      30%  { transform: scale(1.15) translateY(-15px);}
-      45%  { transform: scale(0.97) translateY(5px);}
-      60%  { transform: scale(1.10) translateY(-8px);}
-      100% { transform: scale(1) translateY(0);}
+      0% { transform: scale(1) translateY(0) rotate(0deg); }
+      20% { transform: scale(1.3) translateY(-12px) rotate(-10deg); }
+      40% { transform: scale(1.1) translateY(4px) rotate(5deg); }
+      60% { transform: scale(1.25) translateY(-8px) rotate(-5deg); }
+      80% { transform: scale(1.05) translateY(2px) rotate(2deg); }
+      100% { transform: scale(1.15) translateY(0) rotate(0deg); }
     }
 
     .main-content {
@@ -113,30 +259,142 @@
       position: relative;
       z-index: 1;
     }
+    
     .forecast-container {
       max-width: 880px;
       width: 98%;
       margin: 48px auto;
-      background: rgba(255,255,255,0.92);
-      backdrop-filter: blur(16px) saturate(120%);
-      border-radius: 28px;
-      box-shadow: 0 10px 40px 0 rgba(102,126,234,0.13), 0 1.5px 8px 0 #b5b5ee22;
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(25px) saturate(120%);
+      border-radius: 32px;
+      box-shadow: 
+        0 25px 60px 0 rgba(102, 126, 234, 0.15), 
+        0 8px 25px 0 rgba(185, 185, 238, 0.1),
+        inset 0 1px 0 rgba(255, 255, 255, 0.8);
       padding: 0;
       overflow: hidden;
-      border: 1.5px solid rgba(255,255,255,0.18);
+      border: 1.5px solid rgba(255, 255, 255, 0.4);
       position: relative;
+      transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+      animation: containerFloat 10s ease-in-out infinite;
     }
+    
+    @keyframes containerFloat {
+      0%, 100% { 
+        transform: translateY(0px) rotate(0deg); 
+        box-shadow: 
+          0 25px 60px 0 rgba(102, 126, 234, 0.15), 
+          0 8px 25px 0 rgba(185, 185, 238, 0.1);
+      }
+      50% { 
+        transform: translateY(-8px) rotate(0.3deg); 
+        box-shadow: 
+          0 35px 80px 0 rgba(102, 126, 234, 0.2), 
+          0 12px 35px 0 rgba(185, 185, 238, 0.15);
+      }
+    }
+    
+    .forecast-container::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 4px;
+      background: linear-gradient(90deg, 
+        #6dd5ed 0%, 
+        #2193b0 25%, 
+        #3a8fff 50%, 
+        #2193b0 75%, 
+        #6dd5ed 100%);
+      background-size: 200% 100%;
+      animation: borderFlow 3s ease-in-out infinite;
+      border-radius: 32px 32px 0 0;
+    }
+    
+    @keyframes borderFlow {
+      0%, 100% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+    }
+    
+    .forecast-container::after {
+      content: '';
+      position: absolute;
+      top: -3px;
+      left: -3px;
+      right: -3px;
+      bottom: -3px;
+      background: linear-gradient(45deg, 
+        rgba(109, 213, 237, 0.15), 
+        rgba(33, 147, 176, 0.2), 
+        rgba(58, 143, 255, 0.15));
+      border-radius: 35px;
+      z-index: -1;
+      filter: blur(6px);
+      opacity: 0.6;
+      animation: glowPulse 4s ease-in-out infinite;
+    }
+    
+    @keyframes glowPulse {
+      0%, 100% { 
+        opacity: 0.4; 
+        transform: scale(1); 
+        filter: blur(6px);
+      }
+      50% { 
+        opacity: 0.7; 
+        transform: scale(1.02); 
+        filter: blur(8px);
+      }
+    }
+    
+    .forecast-container:hover {
+      transform: translateY(-4px) scale(1.01);
+      box-shadow: 
+        0 30px 80px 0 rgba(102, 126, 234, 0.2), 
+        0 15px 40px 0 rgba(185, 185, 238, 0.15);
+    }
+    
     .forecast-header {
       padding: 36px 48px 18px 48px;
       background: linear-gradient(98deg, #6dd5ed 0%, #2193b0 100%);
       color: #fff;
-      border-radius: 28px 28px 0 0;
-      box-shadow: 0 2px 16px rgba(102,126,234,0.08);
+      border-radius: 32px 32px 0 0;
+      box-shadow: 0 6px 30px rgba(102, 126, 234, 0.15);
       display: flex;
       flex-direction: column;
       gap: 8px;
       align-items: flex-start;
+      position: relative;
+      overflow: hidden;
     }
+    
+    .forecast-header::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: 
+        radial-gradient(circle at 25% 25%, rgba(255, 255, 255, 0.15) 0%, transparent 50%),
+        radial-gradient(circle at 75% 75%, rgba(255, 255, 255, 0.1) 0%, transparent 50%),
+        linear-gradient(45deg, transparent 30%, rgba(255, 255, 255, 0.08) 50%, transparent 70%);
+      animation: headerShimmer 5s ease-in-out infinite;
+      pointer-events: none;
+    }
+    
+    @keyframes headerShimmer {
+      0%, 100% { 
+        transform: translateX(-50px) rotate(0deg); 
+        opacity: 0.6; 
+      }
+      50% { 
+        transform: translateX(50px) rotate(1deg); 
+        opacity: 0.9; 
+      }
+    }
+    
     .forecast-title {
       font-size: 2.2rem;
       font-weight: 800;
@@ -144,18 +402,44 @@
       display: flex;
       align-items: center;
       gap: 0.7rem;
+      position: relative;
+      z-index: 2;
     }
+    
     .forecast-title i {
-      animation: iconIdle 2.5s infinite linear;
-      /* Animate the header clock icon */
+      animation: titleIconDance 5s ease-in-out infinite;
+      filter: drop-shadow(0 2px 4px rgba(255, 255, 255, 0.3));
     }
+    
+    @keyframes titleIconDance {
+      0%, 100% { 
+        transform: rotate(0deg) scale(1); 
+        filter: drop-shadow(0 2px 4px rgba(255, 255, 255, 0.3));
+      }
+      25% { 
+        transform: rotate(-12deg) scale(1.1); 
+        filter: drop-shadow(0 4px 8px rgba(255, 255, 255, 0.4));
+      }
+      50% { 
+        transform: rotate(0deg) scale(1.05); 
+        filter: drop-shadow(0 3px 6px rgba(255, 255, 255, 0.35));
+      }
+      75% { 
+        transform: rotate(12deg) scale(1.1); 
+        filter: drop-shadow(0 4px 8px rgba(255, 255, 255, 0.4));
+      }
+    }
+    
     .forecast-subtitle {
       font-size: 1.07rem;
       font-weight: 500;
-      opacity: 0.87;
+      opacity: 0.9;
       margin-top: 2px;
       margin-left: 3px;
+      position: relative;
+      z-index: 2;
     }
+    
     .forecast-tabs {
       padding: 0 48px;
       margin-top: 10px;
@@ -163,94 +447,269 @@
       display: flex;
       gap: 10px;
     }
+    
     .forecast-tab {
-      background: #e0e7ff;
+      background: rgba(224, 231, 255, 0.8);
       border: none;
       outline: none;
-      border-radius: 9px;
-      padding: 8px 22px;
+      border-radius: 12px;
+      padding: 12px 28px;
       font-size: 1.09rem;
       color: #4f46e5;
       font-weight: 600;
       cursor: pointer;
-      transition: background 0.2s, color 0.2s;
+      transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+      backdrop-filter: blur(8px);
+      border: 1px solid rgba(255, 255, 255, 0.5);
+      position: relative;
+      overflow: hidden;
+      animation: tabBreathe 6s ease-in-out infinite;
     }
+    
+    @keyframes tabBreathe {
+      0%, 100% { 
+        transform: scale(1);
+        box-shadow: 0 2px 8px rgba(79, 70, 229, 0.1);
+      }
+      50% { 
+        transform: scale(1.02);
+        box-shadow: 0 4px 16px rgba(79, 70, 229, 0.15);
+      }
+    }
+    
+    .forecast-tab::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+      transition: left 0.5s;
+    }
+    
+    .forecast-tab:hover::before {
+      left: 100%;
+    }
+    
     .forecast-tab.active,
     .forecast-tab:hover {
       background: #3a8fff;
       color: #fff;
+      transform: translateY(-4px) scale(1.08);
+      box-shadow: 
+        0 12px 35px rgba(58, 143, 255, 0.3),
+        0 0 0 1px rgba(255, 255, 255, 0.4);
+      animation: activeTabGlow 2s ease-in-out infinite;
     }
+    
+    @keyframes activeTabGlow {
+      0%, 100% { 
+        box-shadow: 
+          0 12px 35px rgba(58, 143, 255, 0.3),
+          0 0 0 1px rgba(255, 255, 255, 0.4);
+      }
+      50% { 
+        box-shadow: 
+          0 16px 45px rgba(58, 143, 255, 0.4),
+          0 0 0 2px rgba(255, 255, 255, 0.6);
+      }
+    }
+    
     .forecast-table {
       width: 100%;
       border-collapse: collapse;
       font-size: 1.07rem;
       background: transparent;
     }
+    
     .forecast-table th {
-      padding: 16px 0;
-      background: #e0e7ff;
+      padding: 18px 0;
+      background: rgba(224, 231, 255, 0.6);
       color: #374151;
       font-weight: 700;
-      border-bottom: 2px solid #e1e1f5;
+      border-bottom: 2px solid rgba(225, 225, 245, 0.8);
       letter-spacing: 0.5px;
       font-size: 1.09rem;
+      backdrop-filter: blur(8px);
+      text-shadow: 0 1px 2px rgba(55, 65, 81, 0.1);
+      position: relative;
     }
+    
+    .forecast-table th::before {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 50%;
+      width: 0;
+      height: 2px;
+      background: #3a8fff;
+      transition: all 0.3s ease;
+      transform: translateX(-50%);
+    }
+    
+    .forecast-table th:hover::before {
+      width: 60%;
+    }
+    
     .forecast-table td {
-      padding: 13px 0;
+      padding: 16px 0;
       text-align: center;
-      border-bottom: 1px solid #f3f4fa;
+      border-bottom: 1px solid rgba(243, 244, 250, 0.8);
       background: transparent;
       font-weight: 500;
       font-size: 1.04rem;
       color: #35354e;
+      transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+      position: relative;
     }
+    
+    .forecast-table tr:hover td {
+      background: rgba(224, 231, 255, 0.3);
+      transform: scale(1.02);
+      box-shadow: 
+        0 4px 15px rgba(58, 143, 255, 0.1),
+        inset 0 1px 0 rgba(255, 255, 255, 0.5);
+    }
+    
+    .forecast-table tr:nth-child(even) td {
+      background: rgba(245, 247, 250, 0.3);
+    }
+    
+    .forecast-table tr:nth-child(even):hover td {
+      background: rgba(224, 231, 255, 0.4);
+    }
+    
     .weather-cell {
       display: flex;
       align-items: center;
       justify-content: center;
       gap: 0.5rem;
     }
+    
     .weather-icon span {
-      font-size: 28px;
-      filter: drop-shadow(0 2px 6px rgba(102,126,234,0.13));
+      font-size: 32px;
+      filter: drop-shadow(0 4px 8px rgba(102, 126, 234, 0.2));
       display: inline-block;
-      animation: iconWeatherIdle 2.6s infinite linear;
+      animation: weatherIconFloat 4s ease-in-out infinite;
+      transition: all 0.3s ease;
     }
-    /* Weather emoji idle animation */
-    @keyframes iconWeatherIdle {
-      0%   { transform: scale(1) rotate(0deg);}
-      10%  { transform: scale(1.12) rotate(-8deg);}
-      20%  { transform: scale(1.08) rotate(7deg);}
-      30%  { transform: scale(1) rotate(0deg);}
-      100% { transform: scale(1) rotate(0deg);}
+    
+    .weather-icon span:hover {
+      transform: scale(1.3) rotate(15deg);
+      filter: drop-shadow(0 6px 12px rgba(102, 126, 234, 0.3));
     }
+    
+    @keyframes weatherIconFloat {
+      0%, 100% { 
+        transform: translateY(0px) rotate(0deg) scale(1); 
+        filter: drop-shadow(0 4px 8px rgba(102, 126, 234, 0.2));
+      }
+      25% { 
+        transform: translateY(-8px) rotate(-10deg) scale(1.1); 
+        filter: drop-shadow(0 8px 16px rgba(102, 126, 234, 0.25));
+      }
+      50% { 
+        transform: translateY(-4px) rotate(0deg) scale(1.05); 
+        filter: drop-shadow(0 6px 12px rgba(102, 126, 234, 0.22));
+      }
+      75% { 
+        transform: translateY(-8px) rotate(10deg) scale(1.1); 
+        filter: drop-shadow(0 8px 16px rgba(102, 126, 234, 0.25));
+      }
+    }
+    
     .wind-info {
       display: flex;
       align-items: center;
-      gap: 6px;
+      gap: 8px;
       color: #0284c7;
       font-weight: 600;
+      transition: all 0.3s ease;
     }
+    
+    .wind-info:hover {
+      transform: scale(1.1);
+      color: #0369a1;
+    }
+    
     .wind-info i {
-      animation: windSpin 1.5s infinite linear;
+      animation: windDance 3s ease-in-out infinite;
       display: inline-block;
+      transition: all 0.3s ease;
     }
-    @keyframes windSpin {
-      0%   { transform: rotate(-20deg);}
-      50%  { transform: rotate(20deg);}
-      100% { transform: rotate(-20deg);}
+    
+    @keyframes windDance {
+      0%, 100% { 
+        transform: rotate(-25deg) scale(1);
+        color: #0284c7;
+      }
+      25% { 
+        transform: rotate(25deg) scale(1.1);
+        color: #0369a1;
+      }
+      50% { 
+        transform: rotate(-15deg) scale(1.05);
+        color: #0284c7;
+      }
+      75% { 
+        transform: rotate(25deg) scale(1.1);
+        color: #0369a1;
+      }
     }
+    
     .temperature-cell {
-      font-size: 1.12rem;
-      font-weight: 700;
+      font-size: 1.18rem;
+      font-weight: 800;
       color: #ef4444;
       letter-spacing: 1px;
+      text-shadow: 0 2px 4px rgba(239, 68, 68, 0.3);
+      animation: tempPulse 5s ease-in-out infinite;
+      transition: all 0.3s ease;
     }
+    
+    .temperature-cell:hover {
+      transform: scale(1.15);
+      color: #dc2626;
+      text-shadow: 0 4px 8px rgba(239, 68, 68, 0.4);
+    }
+    
+    @keyframes tempPulse {
+      0%, 100% { 
+        transform: scale(1);
+        color: #ef4444;
+      }
+      50% { 
+        transform: scale(1.05);
+        color: #f87171;
+      }
+    }
+    
     .time-cell {
-      font-size: 1.08rem;
+      font-size: 1.12rem;
       font-weight: 700;
       color: #2563eb;
+      text-shadow: 0 1px 3px rgba(37, 99, 235, 0.3);
+      animation: timeGlow 4s ease-in-out infinite;
+      transition: all 0.3s ease;
     }
+    
+    .time-cell:hover {
+      transform: scale(1.1);
+      color: #1d4ed8;
+    }
+    
+    @keyframes timeGlow {
+      0%, 100% { 
+        color: #2563eb;
+        text-shadow: 0 1px 3px rgba(37, 99, 235, 0.3);
+      }
+      50% { 
+        color: #3b82f6;
+        text-shadow: 0 2px 6px rgba(37, 99, 235, 0.4);
+      }
+    }
+    
     .loading-state, .error-state {
       text-align: center;
       padding: 38px 0;
@@ -259,34 +718,97 @@
       font-weight: 600;
       background: none;
     }
+    
     .loading-spinner {
       display: inline-block;
-      width: 32px;
-      height: 32px;
-      border: 4px solid #e0e7ff;
-      border-top: 4px solid #3b82f6;
+      width: 45px;
+      height: 45px;
+      border: 5px solid rgba(224, 231, 255, 0.3);
+      border-top: 5px solid #3a8fff;
+      border-right: 5px solid #6dd5ed;
       border-radius: 50%;
-      animation: spin 0.8s linear infinite;
-      margin-bottom: 12px;
+      animation: spinEnhanced 1.5s cubic-bezier(0.68, -0.55, 0.265, 1.55) infinite;
+      margin-bottom: 15px;
+      filter: drop-shadow(0 4px 8px rgba(58, 143, 255, 0.3));
     }
-    @keyframes spin {
-      to { transform: rotate(360deg); }
+    
+    @keyframes spinEnhanced {
+      0% { 
+        transform: rotate(0deg) scale(1);
+        filter: drop-shadow(0 4px 8px rgba(58, 143, 255, 0.3));
+      }
+      50% { 
+        transform: rotate(180deg) scale(1.1);
+        filter: drop-shadow(0 6px 12px rgba(58, 143, 255, 0.4));
+      }
+      100% { 
+        transform: rotate(360deg) scale(1);
+        filter: drop-shadow(0 4px 8px rgba(58, 143, 255, 0.3));
+      }
     }
+    
+    /* Staggered animation for table rows */
+    .forecast-table tr {
+      animation: slideInUp 0.6s ease-out forwards;
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    
+    @keyframes slideInUp {
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+    
+    /* Enhanced responsive design */
     @media (max-width: 1024px) {
       .main-content { margin-left: 60px; }
       .sidebar { width: 60px !important; }
       .forecast-container { max-width: 100vw; }
       .forecast-header, .forecast-tabs { padding-left: 22px; padding-right: 22px; }
     }
+    
     @media (max-width: 768px) {
       .main-content { margin-left: 0; }
-      .forecast-container { margin: 20px 6px; border-radius: 18px; width: calc(100% - 12px); }
+      .forecast-container { 
+        margin: 20px 6px; 
+        border-radius: 25px; 
+        width: calc(100% - 12px);
+        animation: mobileFloat 8s ease-in-out infinite;
+      }
       .forecast-header, .forecast-tabs { padding-left: 10px; padding-right: 10px; }
       .forecast-title { font-size: 1.45rem; }
+      .sidebar { 
+        transform: translateX(-100%); 
+        transition: transform 0.3s ease; 
+      }
+      .sidebar.mobile-open { 
+        transform: translateX(0); 
+      }
+      
+      @keyframes mobileFloat {
+        0%, 100% { transform: translateY(0px); }
+        50% { transform: translateY(-3px); }
+      }
+    }
+    
+    /* Enhanced ripple effect */
+    @keyframes ripple {
+      0% {
+        transform: scale(0);
+        opacity: 1;
+      }
+      100% {
+        transform: scale(2.5);
+        opacity: 0;
+      }
     }
   </style>
 </head>
 <body>
+  <div class="dynamic-overlay"></div>
+  
   <nav class="sidebar">
     <div class="sidebar-content">
       <button class="sidebar-item" id="home-icon" title="ホーム">
@@ -306,6 +828,7 @@
       </button>
     </div>
   </nav>
+  
   <div class="main-content">
     <div class="forecast-container">
       <div class="forecast-header">
@@ -341,6 +864,7 @@
       </table>
     </div>
   </div>
+  
   <script>
     // Sidebar navigation
     document.getElementById('home-icon').onclick = function() {
@@ -369,6 +893,7 @@
       };
       return iconMap[code] || "☁️";
     }
+    
     function getWeatherText(code) {
       const textMap = {
         0: "晴れ", 1: "晴れ時々曇り", 2: "曇り時々晴れ", 3: "曇り", 45: "霧", 48: "霧",
@@ -379,6 +904,7 @@
       };
       return textMap[code] || "曇り";
     }
+    
     function showError(message) {
       const tbody = document.getElementById('forecast-body');
       tbody.innerHTML = `
@@ -390,26 +916,32 @@
         </tr>
       `;
     }
+    
     function displayWeatherData(data) {
       const now = new Date();
       const currentHour = now.getHours();
       const tbody = document.getElementById('forecast-body');
       tbody.innerHTML = '';
       const hoursData = data.hourly;
+      
       if (!hoursData || !hoursData.temperature_2m) {
         showError('天気データがありません');
         return;
       }
+      
       for (let i = 0; i < 24; i++) {
         let hourIndex = currentHour + i;
         if (hourIndex >= hoursData.temperature_2m.length) break;
+        
         const displayHour = (currentHour + i) % 24;
         const temp = hoursData.temperature_2m[hourIndex];
         const windSpeed = hoursData.windspeed_10m[hourIndex];
         const weatherCode = hoursData.weathercode[hourIndex];
         const icon = getWeatherIcon(weatherCode);
         const weatherText = getWeatherText(weatherCode);
+        
         const row = document.createElement('tr');
+        row.style.animationDelay = `${i * 0.1}s`;
         row.innerHTML = `
           <td class="time-cell">${displayHour.toString().padStart(2, '0')}:00</td>
           <td>
@@ -431,6 +963,7 @@
         tbody.appendChild(row);
       }
     }
+    
     function loadWeatherData() {
       if (navigator.geolocation) {
         navigator.geolocation.getCurrentPosition(
@@ -454,8 +987,95 @@
         showError('このブラウザは位置情報をサポートしていません。');
       }
     }
+    
     // Initialize
     loadWeatherData();
+    
+    // Add interactive effects
+    document.addEventListener('DOMContentLoaded', function() {
+      // Container hover effect
+      const container = document.querySelector('.forecast-container');
+      container.addEventListener('mouseenter', function() {
+        this.style.filter = 'brightness(1.02) saturate(1.05)';
+      });
+      container.addEventListener('mouseleave', function() {
+        this.style.filter = 'none';
+      });
+      
+      // Ripple effect on tabs
+      document.querySelectorAll('.forecast-tab').forEach(tab => {
+        tab.addEventListener('click', function(e) {
+          const ripple = document.createElement('span');
+          const rect = this.getBoundingClientRect();
+          const size = Math.max(rect.width, rect.height);
+          const x = e.clientX - rect.left - size / 2;
+          const y = e.clientY - rect.top - size / 2;
+          
+          ripple.style.width = ripple.style.height = size + 'px';
+          ripple.style.left = x + 'px';
+          ripple.style.top = y + 'px';
+          ripple.style.position = 'absolute';
+          ripple.style.background = 'rgba(255,255,255,0.4)';
+          ripple.style.borderRadius = '50%';
+          ripple.style.transform = 'scale(0)';
+          ripple.style.animation = 'ripple 0.6s linear';
+          ripple.style.pointerEvents = 'none';
+          
+          this.style.position = 'relative';
+          this.appendChild(ripple);
+          
+          setTimeout(() => {
+            ripple.remove();
+          }, 600);
+        });
+      });
+      
+      // Add floating particles effect
+      function createFloatingParticle() {
+        const particle = document.createElement('div');
+        particle.style.position = 'fixed';
+        particle.style.width = Math.random() * 4 + 2 + 'px';
+        particle.style.height = particle.style.width;
+        particle.style.background = `rgba(${195 + Math.random() * 60}, ${207 + Math.random() * 40}, ${226 + Math.random() * 29}, ${0.1 + Math.random() * 0.3})`;
+        particle.style.borderRadius = '50%';
+        particle.style.left = Math.random() * window.innerWidth + 'px';
+        particle.style.top = window.innerHeight + 'px';
+        particle.style.pointerEvents = 'none';
+        particle.style.zIndex = '-1';
+        particle.style.animation = `floatUp ${5 + Math.random() * 5}s linear`;
+        
+        document.body.appendChild(particle);
+        
+        setTimeout(() => {
+          particle.remove();
+        }, 10000);
+      }
+      
+      // Create particles periodically
+      setInterval(createFloatingParticle, 2000);
+      
+      // Add floatUp animation
+      const style = document.createElement('style');
+      style.textContent = `
+        @keyframes floatUp {
+          0% {
+            transform: translateY(0) rotate(0deg);
+            opacity: 0;
+          }
+          10% {
+            opacity: 1;
+          }
+          90% {
+            opacity: 1;
+          }
+          100% {
+            transform: translateY(-100vh) rotate(360deg);
+            opacity: 0;
+          }
+        }
+      `;
+      document.head.appendChild(style);
+    });
   </script>
 </body>
 </html>
